@@ -1,0 +1,37 @@
+---
+
+prometheus_agent_node_version: "1.7.0"
+prometheus_agent_node_version_hash: "sha256:a550cd5c05f760b7934a2d0afad66d2e92e681482f5f57a917465b1fba3b02a6"
+
+
+prometheus_agent_snmp_version: "0.25.0"
+prometheus_agent_snmp_install: "{{ ( 'monitoring-server' in group_names) |bool }}"
+
+
+prometheus_agent_jmx_version: "0.18.0"
+prometheus_agent_jmx_version_hash: ""
+prometheus_agent_jmx_install: "{{ ( 'sys-java' in group_names ) |bool }}"
+
+monitoring-prometheus_agent_exporter_jmx:
+  name: "jmx-tester"
+  group: "test"
+  port: 9900
+  exporter_port: 9901
+
+
+
+prometheus_agent_apache_version: "1.0.3"
+prometheus_agent_apache_version_hash: ""
+prometheus_agent_apache_install: "{{ ( 'web-apache' in group_names ) |bool }}"
+
+
+# activate ssl
+# prometheus_agent_ssl_cert_pem: "/etc/ssl/private/reseau.local/reseau.local.pem"
+# prometheus_agent_ssl_cert_key: "/etc/ssl/private/reseau.local/reseau.local.key"
+
+# activate basic auth
+prometheus_agent_auth_basic: yes
+prometheus_agent_auth_basic_user: "testing-auth-agent_user"
+# password is : testing-auth-agent_pass
+prometheus_agent_auth_basic_pass_crypted: "$2y$10$z3qHXVTUNQWtCtckOhJYK.SXYCZdGvxDfFy2zrZm2AAwT8UagQ90C"
+

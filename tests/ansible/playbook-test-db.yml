@@ -1,0 +1,53 @@
+---
+
+- name: All | common
+  hosts: domain
+  remote_user: "{{ domain_ansible_user }}"
+  become: yes
+  gather_facts: true
+  roles:
+    - common
+  tags: always
+
+
+- name: test | role db-mysql
+  hosts: linux:&db-mysql
+  remote_user: "{{ domain_ansible_user }}"
+  become: yes
+  gather_facts: false
+  
+  roles:
+    # variables are in the groups
+    - db-mysql
+  vars:
+    mysql_version: "10.11"
+
+    mysql_conf_dir: "/server/mysql/conf"
+    mysql_data_dir: "/server/mysql/data"
+
+    mysql_config_connection_max: 10
+
+    mysql_config_performance_schema: "ON"
+
+    # db and user declarations are in the inventory
+
+
+- name: test | role db-postgresql
+  hosts: linux:&db-postgresql
+  remote_user: "{{ domain_ansible_user }}"
+  become: yes
+  gather_facts: false
+
+  roles:
+    # variables are in the groups
+    - db-postgresql
+  vars:
+    postgresql_version: "16"
+
+    postgresql_listen_address: "*"
+
+    postgresql_conf_dir: "/server/postgresql/conf"
+    postgresql_data_dir: "/server/postgresql/data"
+
+    # db and user declarations are in the inventory
+

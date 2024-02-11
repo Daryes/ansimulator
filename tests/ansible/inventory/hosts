@@ -1,0 +1,131 @@
+#
+# This inventory reuse the containers name created by
+# the file .ci/docker-compose.ansimulator.yml
+#
+# The groups are related to the ansible playbooks
+#
+
+# local connection - disable ssh usage for localhost
+[local]
+127.0.0.1          ansible_connection=local
+
+
+[ansible]
+ci-ansible-master
+
+[ansible:vars]
+# force local connexion and if required not using the python available under /usr/libexec/
+ansible_connection=local
+# ansible_python_interpreter=/usr/bin/python3
+
+
+# -------------------------------------
+[domain]
+[domain:children]
+linux
+windows
+
+
+[linux]
+ci-ansible-master
+ci-test-centos-[1:3]
+ci-test-debian-[1:1]
+
+
+[windows]
+# nobody here
+
+
+# collecting all possible centos and debian instances
+[ci-group-centos]
+ci-test-centos-[1:99]   ansible_python_interpreter=/usr/bin/python3
+
+[ci-group-debian]
+ci-test-debian-[1:99]   ansible_python_interpreter=/usr/bin/python3
+
+
+[env_preproduction]
+ci-test-centos-1
+
+[env_staging]
+ci-test-debian-1
+
+
+[sys-docker]
+# DinD + WLS2 do not work on rhel/centos
+# ci-test-centos-1
+ci-test-debian-1
+
+
+[scheduler-rundeck]
+ci-test-centos-1
+
+
+[scheduler-rundeck-docker]
+[scheduler-rundeck-docker:children]
+sys-docker
+
+
+[dns-server]
+ci-ansible-master
+
+
+[web-apache]
+ci-test-centos-1
+ci-test-debian-1
+
+
+[vpn-openvpn]
+ci-test-centos-1
+ci-test-debian-1
+
+
+[vpn-wireguard]
+ci-test-centos-2
+ci-test-debian-2
+
+
+[mail-relay]
+ci-test-centos-1
+ci-test-debian-1
+
+
+[web-nginx]
+ci-test-centos-2
+ci-test-debian-2
+
+
+[monitoring-agent]
+[monitoring-agent:children]
+linux
+
+
+[monitoring-server]
+ci-test-debian-2
+ci-test-centos-2
+
+
+[ntp-chrony]
+ci-test-centos-2
+ci-test-debian-2
+
+
+[sys-java]
+ci-test-centos-2
+ci-test-debian-2
+
+
+[sys-sssd]
+ci-test-centos-3
+ci-test-debian-3
+
+
+[db-mysql]
+ci-test-centos-3
+ci-test-debian-3
+
+
+[db-postgresql]
+ci-test-centos-3
+ci-test-debian-3
+

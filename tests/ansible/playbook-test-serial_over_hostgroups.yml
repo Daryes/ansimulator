@@ -1,0 +1,44 @@
+---
+
+- name: All | common
+  hosts: domain
+  remote_user: "{{ domain_ansible_user }}"
+  become: yes
+  gather_facts: true
+  roles:
+    - common
+  tags: always
+
+
+- name: test | role _serial_over_hostgroups
+  hosts: linux
+  remote_user: "{{ domain_ansible_user }}"
+  become: yes
+  gather_facts: false
+
+
+  # In a playbook, the order is : pre_tasks, roles, then tasks
+  
+  roles:
+    # usual usage is with an include, but works also as a standalone orle
+    - name: _include-serial_over_hostgroups
+      vars:
+        serial_over_hostgroups_patterns:
+          - "ansible"
+          - "ci-group-centos:&linux"
+          - "ci-test-debian-1:&linux"
+          - "ci-group-debian:!ci-test-debian-1:&linux"
+        serial_over_hostgroups_exclude_servers: []
+
+
+  tasks:
+    # Let's see the resulting sets
+    - debug:
+        msg: "{{ _serial_over_hostgroups }}"
+      run_once: yes
+
+
+    - include_role: name=hello-world
+      with_items: "{{ _serial_over_hostgroups }}"
+      when: inventory_hostname in item.hosts
+

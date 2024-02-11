@@ -1,0 +1,8 @@
+---
+
+# environment ################
+
+envir_type: tests_ci
+envir_type_short: test
+envir_type_tri: tst
+envir_type_char: t

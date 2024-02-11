@@ -1,0 +1,9 @@
+.vscode
+id_rsa
+secure.yaml
+inventories/**
+roles/**
+ansible
+ansible/**
+# must be last
+!tests/**

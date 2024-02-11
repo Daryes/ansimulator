@@ -1,0 +1,4 @@
+%sudo ALL=(ALL) NOPASSWD: /etc/init.d/docker start
+%sudo ALL=(ALL) NOPASSWD: /usr/sbin/service docker start
+# change the path
+%sudo ALL=(ALL) NOPASSWD: /path/to/ansimulator/.ci/wsl/setup_host_systemd.sh

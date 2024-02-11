@@ -1,0 +1,113 @@
+---
+version: "3.4"
+
+
+# systemd requirements
+# ref: https://developers.redhat.com/blog/2014/05/05/running-systemd-within-docker-container
+x-service-systemd: &conf-systemd
+  sysctls:
+    net.unix.max_dgram_qlen: 512
+  cgroup: host
+  security_opt:
+    - seccomp:unconfined
+  cap_add:
+    - SYS_ADMIN
+  tmpfs:
+    - /run
+    - /run/lock
+
+
+x-service-centos: &img-centos
+  environment:
+    - ANSIBLE_VAULT_PASS_FILE=${ANSIBLE_VAULT_PASS_FILE}
+  image: ${IMAGE_CENTOS_CI}
+  networks:
+    - ansible_simulator
+  # DinD requirement
+  privileged: true
+  <<: *conf-systemd
+
+
+x-service-debian: &img-debian
+  environment:
+    - ANSIBLE_VAULT_PASS_FILE=${ANSIBLE_VAULT_PASS_FILE}
+  image: ${IMAGE_DEBIAN_CI}
+  networks:
+    - ansible_simulator
+  # DinD requirement
+  privileged: true
+  <<: *conf-systemd
+
+
+x-volume: &volume-tmpl
+  volumes:
+    # timezone - no mount as both can be modified when tzdata packages are updated
+    # - /etc/timezone:/etc/timezone:ro
+    # - /etc/localtime:/etc/localtime:ro
+    # systemd requirement - must be RW for latest versions
+    - /sys/fs/cgroup:/sys/fs/cgroup:rw
+    # ansible shared volume for the ssh key
+    - ansible_simulator_sshkey:/home/ansible/.ssh:rw
+    # Docker in Docker requirement
+    - ansible_simulator_temp_docker_vol:/var/lib/docker
+
+
+services:
+  ansible-master:
+    <<: *img-debian
+    hostname: ansiblemaster
+    container_name: ci-ansible-master
+    volumes:
+      # ansible directories
+      - ../:/opt/repo:ro
+      - ../ansible/:/etc/ansible:${ANSIBLE_DIR_ETC_MODE}
+      - ../tests/ansible:/opt/ansible:rw
+      # volume-tmpl - templating is not able to combine elements with a template - must declare the volumes again
+      - /sys/fs/cgroup:/sys/fs/cgroup:rw
+      - ansible_simulator_sshkey:/home/ansible/.ssh:rw
+      - ansible_simulator_temp_docker_vol:/var/lib/docker
+    working_dir: /home/ansible
+
+
+  test-centos:
+    <<: [ *img-centos, *volume-tmpl ]
+    depends_on:
+      - ansible-master
+    ports:
+      # this format is required when using replicas
+      - target: 80
+        protocol: tcp
+        host_ip: "${DOCKER_HOST_IP:-127.0.0.1}"
+      - target: 443
+        protocol: tcp
+        host_ip: "${DOCKER_HOST_IP:-127.0.0.1}"
+    deploy:
+      mode: replicated
+      replicas: ${CENTOS_CONTAINER_COUNT}
+
+
+  test-debian:
+    <<: [ *img-debian, *volume-tmpl ]
+    depends_on:
+      - ansible-master
+    ports:
+      # this format is required when using replicas
+      - target: 80
+        protocol: tcp
+        host_ip: "${DOCKER_HOST_IP:-127.0.0.1}"
+      - target: 443
+        protocol: tcp
+        host_ip: "${DOCKER_HOST_IP:-127.0.0.1}"
+    deploy:
+      mode: replicated
+      replicas: ${DEBIAN_CONTAINER_COUNT}
+
+
+volumes:
+  ansible_simulator_sshkey:
+  ansible_simulator_temp_docker_vol:
+
+
+networks:
+  ansible_simulator:
+

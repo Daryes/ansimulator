@@ -1,0 +1,100 @@
+---
+
+- name: All | common
+  hosts: domain
+  remote_user: "{{ domain_ansible_user }}"
+  become: yes
+  gather_facts: true
+  roles:
+    - common
+  tags: always
+
+
+- name: test | role certificate-generate_ca - CA certificate
+  hosts: ansible
+  gather_facts: false
+  roles:
+    - role: certificate-generate_ca
+      vars:
+        ca_certificate_dir: "/etc/ssl/private/ca"
+        ca_certificate_filename_no_ext: "my_test_ca"
+        ca_certificate_privatekey_passphrase: "EnManqueDInspirationPour1Passphrase!"
+        ca_certificate_common_name: "My Testing CA"
+        ca_certificate_email_address: "sylvestre@worldcompany.com"
+        ca_certificate_country_name: "FR"
+        ca_certificate_organization_name: "World Company"
+        ca_certificate_organization_unit: "ACME"
+
+
+- name: test | role certificate-generate_ca_intermediate - Intermediate CA certificate
+  hosts: ansible
+  gather_facts: false
+  roles:
+    - role: certificate-generate_ca_intermediate
+      vars:
+        cainter_certificate_dir: "/etc/ssl/private/ca_inter"
+        cainter_certificate_filename_no_ext: "my_test_ca_inter"
+        cainter_certificate_privatekey_passphrase: "ToujoursEnManqueDInspirationPour1AutrePassphrase!"
+        cainter_certificate_common_name: "My Testing Intermediate CA"
+        cainter_certificate_email_address: "sylvestre@worldcompany.com"
+        cainter_certificate_country_name: "FR"
+        cainter_certificate_organization_name: "World Company"
+        cainter_certificate_organization_unit: "ACME"
+        local_ca_type: "file"
+        local_ca_path: "/etc/ssl/private/ca/my_test_ca.pem"
+        local_ca_privatekey_path: "/etc/ssl/private/ca/my_test_ca.key"
+        local_ca_privatekey_passphrase: "EnManqueDInspirationPour1Passphrase!"
+
+
+- name: test | role certificate-generate - domain certificate for https
+  # could target directly the desired server - use "ansible" for cert-push-private validation
+  hosts: ansible
+  gather_facts: false
+  roles:
+    - role: certificate-generate
+      vars:
+        server_certificate_subject_name: "conquest.worldcompany.com"
+        server_certificate_alt_name: [ "DNS:{{ server_certificate_subject_name }}", "DNS:*.{{ server_certificate_subject_name }}", DNS:"pardon-aux-familles.tout.ca" ]
+        server_certificate_email_address: "bob@worldcompany.com"
+        server_certificate_country_name: "FR"
+        server_certificate_organization_name: "World Company"
+        server_certificate_organization_unit: "Bwaaaar"
+        # notice : theses parameters are related to the intermediate CA
+        local_ca_type: "file"
+        local_ca_path: "/etc/ssl/private/ca_inter/my_test_ca_inter.pem"
+        local_ca_privatekey_path: "/etc/ssl/private/ca_inter/my_test_ca_inter.key"
+        local_ca_privatekey_passphrase: "ToujoursEnManqueDInspirationPour1AutrePassphrase!"
+        server_certificate_chain_add_ca_public_cert: yes
+        # should be yes, but required for the push-private test
+        server_certificate_delete_certs_in_ansible_cache: no
+        # for testing purpose
+        server_certificate_force_replacement: no
+
+
+- name: test | role certificate-push-trusted - install CA public cert on all servers
+  hosts: linux
+  gather_facts: false
+  become: yes
+  roles:
+    - role: certificate-push-trusted
+      vars:
+        local_certificates_public_push:
+          - "/etc/ssl/private/ca/my_test_ca.pem"
+
+
+- name: test | role certificate-push-private - deploy private cert on servers
+  hosts: web-nginx:web-apache:&linux
+  gather_facts: false
+  become: yes
+  roles:
+    - role: certificate-push-private
+      vars:
+        certificates_private_push:
+          - name: "conquest.worldcompany.com"
+            # lookup cannot use become/sudo to access a restricted file on the ansible controller - use the cache instead
+            # the correct way would be to either push a cert as a variable from a vault
+            # or skip the push role and have the generate role targeting the final servers
+            pem: "{{ lookup('file', '/server/ansible/cache/certificate-generate/conquest.worldcompany.com.pem') }}"
+            key: "{{ lookup('file', '/server/ansible/cache/certificate-generate/conquest.worldcompany.com.key') }}"
+            combined_create: yes
+

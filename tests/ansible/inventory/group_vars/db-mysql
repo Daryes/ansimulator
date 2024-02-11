@@ -1,0 +1,12 @@
+---
+
+# required in a group file due to the group name
+
+db-mysql_mysql_db:
+  - db: "ci_testing"
+
+db-mysql_mysql_user:
+  - name: "testing"
+    password: "NoTestForThee"
+    priv: "testing.*:ALL"
+

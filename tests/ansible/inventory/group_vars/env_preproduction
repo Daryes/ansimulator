@@ -1,0 +1,8 @@
+---
+
+# environment ################
+
+envir_type: preproduction
+envir_type_short: preprod
+envir_type_tri: pre
+envir_type_char: o

@@ -1,0 +1,48 @@
+---
+
+- name: All | common
+  hosts: domain
+  remote_user: "{{ domain_ansible_user }}"
+  become: yes
+  gather_facts: true
+  roles:
+    - common
+  tags: always
+
+
+- name: test | role monitoring-prometheus_agent
+  hosts: linux:&monitoring-agent
+  remote_user: "{{ domain_ansible_user }}"
+  become: yes
+  gather_facts: false
+
+  roles:
+    - monitoring-prometheus_agent
+  tags: agent, agents
+  # variables are in the inventory under group_vars/monitoring-agent
+
+
+- name: test | role monitoring-prometheus
+  hosts: linux:&monitoring-server
+  remote_user: "{{ domain_ansible_user }}"
+  become: yes
+  gather_facts: false
+  
+  roles:
+    - monitoring-prometheus
+  tags: server, prometheus, alertmanager
+  # variables are in the inventory under group_vars/monitoring-server/
+
+
+- name: test | role monitoring-grafana
+  hosts: linux:&monitoring-server
+  remote_user: "{{ domain_ansible_user }}"
+  become: yes
+  gather_facts: false
+
+  roles:
+    - monitoring-grafana
+    # no nginx, set in the dedicated playbook-test-web.yml
+  tags: server, grafana
+  # variables are in the inventory under group_vars/monitoring-server/
+

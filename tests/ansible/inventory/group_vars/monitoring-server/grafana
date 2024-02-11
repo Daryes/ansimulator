@@ -1,0 +1,113 @@
+---
+
+grafana_version: "9.3.8"
+grafana_version_hash_deb: ""
+grafana_version_hash_rpm: ""
+
+
+grafana_server_name: "grafana.testing.local"
+grafana_listen_port: 3000
+grafana_listen_ip: "0.0.0.0"
+
+
+# grafana public domain.tld
+grafana_domain: "{{ grafana_server_name }}"
+
+
+# nginx configuration
+monitoring-server_nginx:
+  # grafana
+  - server_name: "{{ grafana_server_name }}"
+    # make it reachable from the docker host
+    server_alias: [ 'localhost', 'mylocalserver' ]
+    # use the default _no_ssl template
+    site_vhost_template: "templates/etc/nginx/sites-available/vhost-template_no_ssl.conf.j2"
+    proxypass_target: "http://127.0.0.1:3000"
+    raw_settings: [ 'client_max_body_size 10M;' ]
+
+
+
+# change data and conf dir location
+grafana_conf_dir: "/server/grafana/conf"
+grafana_data_dir: "/server/grafana/data"
+
+
+grafana_plugins_install:
+  - "vonage-status-panel"
+  - "natel-discrete-panel"
+  - "mxswat-separator-panel"
+  - "yesoreyeram-boomtheme-panel"
+
+
+grafana_provisioning_dashboards_transferts:
+  - source: "/etc/ansible/roles/monitoring-grafana-dashboard/files/dashboards"
+    dest: "provisioning"
+    mode: "dirsync"
+
+
+grafana_provisioning_dashboards:
+  apiVersion: 1
+  providers:
+    - name: dashboards
+      type: file
+      updateIntervalSeconds: 60
+      options:
+        path: /etc/grafana/provisioning/dashboards
+        foldersFromFilesStructure: true
+
+
+grafana_config_settings:
+  # required for alerting
+  - { section: "unified_alerting", param: "execute_alerts",    value: "true" }
+
+  # swagger API ui - disabled by default
+  - { section: "feature_toggles",  param: "swaggerUi",         value: "false" }
+
+  # allow writer to manage folders and teams
+  - { section: "users",            param: "editors_can_admin", value: "true" }
+
+  # disable some stuff
+  - { section: "security",         param: "disable_gravatar",  value: "true" }
+  - { section: "users",            param: "allow_sign_up",     value: "false" }
+  - { section: "auth.anonymous",   param: "enabled",           value: "false" }
+  - { section: "dashboards",       param: "versions_to_keep",  value: "10" }
+
+  # logs
+  - { section: "log",              param: "mode",              value: "file" }
+  - { section: "log",              param: "level",             value: "warn" }
+
+
+grafana_provisioning_admin_login: "admin"
+grafana_provisioning_admin_password: "testing"
+
+grafana_provisioning_org_name: "testing organization"
+
+grafana_provisioning_users:
+  - login: "lecture"
+    password: "readonly"
+
+
+grafana_provisioning_datasources:
+  apiVersion: 1
+#  deleteDatasources:
+#    - name: "Prometheus
+#      orgId: 1
+  datasources:
+    - name: "TestData DB"
+      type: testdata
+      uid: "testdatadb"
+
+    - name: Prometheus
+      type: prometheus
+      access: proxy
+      url: http://localhost:9090
+      jsonData:
+        timeInterval: 1m
+        httpMethod: 'POST'
+      isDefault: true
+      editable: false
+      basicAuth: true
+      basicAuthUser: "grafana_user"
+      secureJsonData:
+        basicAuthPassword: "grafana_pass"
+

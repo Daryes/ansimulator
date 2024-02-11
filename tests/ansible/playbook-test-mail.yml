@@ -1,0 +1,50 @@
+---
+
+- name: All | common
+  hosts: domain
+  remote_user: "{{ domain_ansible_user }}"
+  become: yes
+  gather_facts: true
+  roles:
+    - common
+  tags: always
+
+
+- name: test | role mail-postfix_relay
+  hosts: linux:&mail-relay
+  remote_user: "{{ domain_ansible_user }}"
+  become: yes
+  gather_facts: false
+  
+  roles:
+    - mail-postfix_relay
+  vars:
+    postfix_thishost_name: "{{ inventory_hostname }}"
+    postfix_thishost_domain: "testing.local"
+
+    relay_outbound_password: "my_password"
+
+    # list of ip or network ranges allowed to connect to this server
+    postfix_allowed_networks:
+      - "127.0.0.0/8"
+      - "{{ network_range }}"
+
+    postfix_auth_allow_anonymous: yes
+    postfix_smtp_server_tls_auth_only: no
+
+    postfix_relay_restriction: yes
+    # prevent as recipients the use of test.domain.local, send rest of domain.local to filtering, anything else will be blocked
+    postfix_relay_restriction_recipient_block: [ 'test.domain.local' ]
+    postfix_relay_restriction_recipient_filter_sender: [ 'domain.local', '.domain.local' ]
+    # allow any senders
+    postfix_relay_restriction_filter_sender_allow: []
+    postfix_relay_restriction_filter_sender_block: []
+
+    postfix_relay_transport:
+      - dest_domain: "*"
+        next_relay: "smtp:[smtp.outbound.local]:587"
+        auth_user_pass: "user@outbound.local:{{ relay_outbound_password }}"
+
+    postfix_local_aliases:
+      - { alias: "unit-test", redir_to: "root" }
+

@@ -1,0 +1,22 @@
+# Custom configuration to reduce package installation footprint
+APT::Install-Suggests "false";
+APT::Install-Recommends "false";
+
+
+# force autoremove packages installed through Recommends or Depends
+Apt::AutoRemove::SuggestsImportant "false";
+
+
+# retrive package indexes in a compressed state
+Acquire::GzipIndexes "true";
+Acquire::CompressionTypes::Order:: "gz";
+
+
+# filter out languages
+Acquire::Languages "none";
+
+
+# clean automatically apt cache directories
+DPkg::Post-Invoke { "rm -f /var/cache/apt/archives/*.deb /var/cache/apt/archives/partial/*.deb /var/cache/apt/*.bin || true"; };
+APT::Update::Post-Invoke { "rm -f /var/cache/apt/archives/*.deb /var/cache/apt/archives/partial/*.deb /var/cache/apt/*.bin || true"; };
+Dir::Cache::pkgcache ""; Dir::Cache::srcpkgcache "";

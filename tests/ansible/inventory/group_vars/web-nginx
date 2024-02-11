@@ -1,0 +1,22 @@
+---
+
+nginx_global_auth_user_list:
+  - { user: "testing", password: "$apr1$crypted", comment: "test user" }
+
+
+web-nginx_nginx:
+  # simple test
+  - server_name: "testing.localhost"
+    site_vhost_template: "templates/etc/nginx/sites-available/vhost-template_no_ssl.conf.j2"
+    proxypass_target: "http://127.0.0.1:8080"
+    site_vhost_log_dir: "/var/log/nginx/testing"
+    raw_settings: [ 'client_max_body_size 10M;' ]
+
+
+web-nginx_stream_nginx:
+  # validate the configuration - no problem if there is no backend running
+  - name: "streamtest"
+    proxy_pass_ip: 127.0.0.1
+    ports: [ 9043, 9080 ]
+    proxy_backend_ports: [ "port_9080": "10080" ]
+

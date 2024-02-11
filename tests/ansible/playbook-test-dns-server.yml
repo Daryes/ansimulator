@@ -1,0 +1,79 @@
+---
+
+- name: All | common
+  hosts: domain
+  remote_user: "{{ domain_ansible_user }}"
+  become: yes
+  gather_facts: true
+  roles:
+    - common
+  tags: always
+
+
+- name: test | role dns-bind
+  hosts: linux:&dns-server
+  remote_user: "{{ domain_ansible_user }}"
+  become: yes
+  gather_facts: false
+  
+  roles:
+    - dns-bind
+  vars:
+    bind_listen_ipv4_list: [ "any" ]
+    bind_cache_max_size: "5%"
+    bind_forwarders:
+      - "192.168.1.1"
+
+    bind_zones_dns:
+      # standard zone with its db file
+      - name: "testing.local"
+        zone_template: "templates/etc/named/zones.d/zone-template.zone.j2"
+        zone_type: "zone"
+        allow_transfert: [ "{{ hostvars[ inventory_hostname ].ansible_default_ipv4.address }}" ]
+
+      - name: "testing.local"
+        zone_template: "templates/etc/named/zones.d/zone-template.db.j2"
+        zone_type: "db"
+        email: "do-not-care@testing.local"
+        serial: 123
+        ns: [ "{{ inventory_hostname }}.testing.local" ]
+        mx: []
+        spf: []
+        records_inventory: yes
+        allow_ipv4: yes
+        allow_ipv6: no
+        allow_ipv4_wildcard: yes
+        records_raw:
+          - "ansible   IN CNAME  ci-ansible-master"
+          # max 64 chars per segment between each .
+          - "{{ '%-29s'|format( 'a-very-long-string-enough-to-go-over.thirty-characters.to-see-what-happens' ) }} IN CNAME  ansible"
+          # generate a cname entry for the first server in the mail-relay group - multiple identical CNAME records is not valid, use IP instead
+          - "{{['mail  IN A     '] |product(  groups['mail-relay'] |map('extract', hostvars) |map(attribute='ansible_default_ipv4.address')  ) |map('join') |list }}"
+
+      # transfer zone
+      # only for test as the transfer itself will not work due to the fictive zone
+      - name: "transfer.test.local"
+        zone_template: "templates/etc/named/zones.d/transfer-template.zone.j2"
+        zone_type: "zone"
+        masters: [ "{{ hostvars[ inventory_hostname ].ansible_default_ipv4.address }}" ]
+        refresh_min_time: "120"
+        refresh_max_time: "900"
+
+      # reverse zone and db files - more tricky - also handle the docker ip range changing on container start
+      # reuse the dns server default ip, remove the starting "0.0." and the last "." from the name
+      - name: "{{ ansible_default_ipv4.address |ipaddr('revdns') |regex_replace('^[0-9]+\\.[0-9]+\\.', '') |regex_replace('\\.$', '') }}"
+        zone_template: "templates/etc/named/zones.d/zone-template.zone.j2"
+        zone_type: "zone"
+
+      - name: "{{ ansible_default_ipv4.address |ipaddr('revdns') |regex_replace('^[0-9]+\\.[0-9]+\\.', '') |regex_replace('\\.$', '') }}"
+        zone_template: "templates/etc/named/zones.d/reverse-template.db.j2"
+        zone_type: "db"
+        email: "do-not-care@testing.local"
+        serial: 123
+        ns: [ "{{ inventory_hostname }}.testing.local" ]
+        records_inventory: yes
+        records_domain: "testing.local"
+        allow_ipv4: yes
+        allow_ipv6: no
+        records_raw: []
+

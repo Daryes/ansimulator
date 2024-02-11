@@ -1,0 +1,40 @@
+---
+
+- name: All | common
+  hosts: domain
+  remote_user: "{{ domain_ansible_user }}"
+  become: yes
+  gather_facts: true
+  roles:
+    - common
+  tags: always
+
+
+- name: test | role sys-docker - install docker and docker-compose
+  hosts: linux:&sys-docker
+  remote_user: "{{ domain_ansible_user }}"
+  become: yes
+  gather_facts: false
+  
+  pre_tasks:
+    - name: validate group_vars
+      assert:
+        that:
+          - docker_compose_version is defined
+          - docker_config_default_address_pools is defined
+        fail_msg: "Error: one of the mandatory parameters for docker is not set in the inventory"
+        quiet: yes
+  
+  roles:
+    - sys-docker
+  vars:
+    docker_compose_version: "2.15.1"
+    docker_compose_usrbin_symlink: true
+
+    # cannot work in a container : /var/lib/docker is not moveable as it is a docker volume
+    # docker_data_dir: "{{ project_root }}/sys-docker"
+
+    docker_config_default_address_pools:
+      - base: "{{ network_range }}"
+        size: 24
+

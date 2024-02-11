@@ -1,0 +1,33 @@
+---
+
+- name: All | common
+  hosts: domain
+  remote_user: "{{ domain_ansible_user }}"
+  become: yes
+  gather_facts: true
+  roles:
+    - common
+  tags: always
+
+
+- name: test | role web-nginx
+  hosts: linux:&web-nginx
+  remote_user: "{{ domain_ansible_user }}"
+  become: yes
+  gather_facts: false
+  
+  roles:
+    # variables are in the groups due to the name with web-
+    - web-nginx
+
+
+- name: test | role web-apache
+  hosts: linux:&web-apache
+  remote_user: "{{ domain_ansible_user }}"
+  become: yes
+  gather_facts: false
+
+  roles:
+    # variables are in the groups due to the name with web-
+    - web-apache
+

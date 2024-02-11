@@ -1,0 +1,85 @@
+---
+
+# monitoring jobs -------------------------------------
+
+# add static label to most of jobs
+prometheus_job_all_labels_static:
+  - geo: "{{ geo_dc |default('unknown') |lower }}"
+  - label_all: "_all_static"
+  - test_label_dupe: "_all_static"
+  - env: "dupe _all_static"
+
+
+prometheus_job_secondary_labels_static:
+  - label_secondary: "_secondary_static"
+  - test_label_dupe: "_secondary_static"
+  - env: "dupe _secondary_static"
+  - env_char: "_secondary_static"
+
+
+prometheus_job_all_labels_variable_name:
+  # set the environment as label - default to unknown
+  - env: "envir_type_short"
+  - env_char: "envir_type_char"
+
+
+# blackbox & pushgateway hosts
+prometheus_job_blackbox: [ '127.0.0.1' ]
+prometheus_job_pushgateway: [ '127.0.0.1' ]
+
+
+# job node
+prometheus_job_node:
+  - "{{ groups['domain'] }}"
+
+
+prometheus_job_node_labels_group_filter:
+  - 'app-'
+  - 'db-'
+  - 'sys-docker'
+  - 'mail-'
+  - 'ci-'
+  - 'monitoring-(grafana|prometheus)$'
+  - '(ntp|dns)-(?!client).*'
+
+
+# jobs db
+prometheus_job_db_mysql: "{{ groups['db-mysql'] }}"
+prometheus_job_db_pgsql: []
+
+
+# job webservers
+prometheus_job_web_apache:
+  -  "{{ groups['web-apache'] }}"
+
+
+# job blackbox - website
+prometheus_job_website:
+  - { name: "apache first", url: "{{ groups['web-apache'] |first }}" }
+  - { name: "apache last",  url: "{{ groups['web-apache'] |last }}" }
+
+
+
+# job blackbox - certificate
+prometheus_job_certificate:
+  - { name: "apache first", target: "{{ groups['web-apache'] |first }}:443" }
+  - { name: "apache last",  target: "{{ groups['web-apache'] |last }}:443" }
+
+
+# job blackbox - icmp
+prometheus_job_icmp_scrape_interval: "5m"
+prometheus_job_icmp:
+  - { name: "debian", target: "www.debian.org" }
+  - { name: "rocky", target: "rockylinux.org" }
+  - { name: "github", target: "github.com" }
+
+
+# job cadadvisor
+prometheus_job_cadvisor: "{{ groups['sys-docker'] }}"
+
+# job grafana
+prometheus_job_grafana_ssl: yes
+prometheus_job_grafana_ssl_insecure_skip_verify: yes
+prometheus_job_grafana:
+  - { name: "grafana server", target: "{{ groups['monitoring-server'] |first }}:3000" }
+

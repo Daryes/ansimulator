@@ -1,0 +1,8 @@
+---
+
+# environment ################
+
+envir_type: staging
+envir_type_short: staging
+envir_type_tri: stg
+envir_type_char: i

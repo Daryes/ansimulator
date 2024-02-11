@@ -1,0 +1,12 @@
+---
+
+apache_global_auth_user_list:
+  - { user: "testing", password: "$apr1$crypted", comment: "test user" }
+
+
+web-apache_apache:
+  - server_name: "testing.localhost"
+    site_vhost_template: "templates/etc/apache2/sites-available/vhost-template_reverse_no_ssl.conf.j2"
+    proxypass_target: "http://127.0.0.1:8080"
+    raw_settings: [ ]
+

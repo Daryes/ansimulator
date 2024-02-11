@@ -1,0 +1,54 @@
+---
+
+# prometheus & alertmanager versions (+hash) to install - using the official github release as the rpm does not exist
+# ref: https://prometheus.io/download/
+prometheus_version: "2.45.2"
+prometheus_version_hash: "sha256:be2bd790336cd6beb87f0881c221b7b65d23cb1d2d16f570006546e091e58fc6"
+prometheus_alertmanager_version: "0.26.0"
+prometheus_alertmanager_version_hash: "sha256:abd73e2ee6bf67d3888699660abbecba7b076bf1f9459a3a8999d493b149ffa6"
+
+
+# prometheus & alertmanager listen, port and service settings
+prometheus_listen_ip: "0.0.0.0"
+prometheus_listen_port: "9090"
+prometheus_service_extra_args: ""
+
+prometheus_alertmanager_listen_ip: "0.0.0.0"
+prometheus_alertmanager_listen_port: "9093"
+prometheus_alertmanager_service_extra_args: ""
+
+
+# dir locations
+prometheus_conf_dir: "/server/prometheus/conf"
+prometheus_data_dir: "/server/prometheus/data"
+
+
+#prometheus_ssl_cert_pem: "/etc/ssl/private/reseau.local/reseau.local.pem"
+#prometheus_ssl_cert_key: "/etc/ssl/private/reseau.local/reseau.local.key"
+
+
+# basic auth
+prometheus_auth_basic_users:
+  - user: "testing-auth-server_user"
+    # pass is : testing-auth-server_pass
+    pass_crypted: "$2y$10$qfofRYZhKB9BEQVV0jCnueAemerFt4iypVxJkEbQhcXpRbb7q1NX2"
+
+  - user: "grafana_user"
+    # pass is : grafana_pass
+    pass_crypted: "$2y$10$k3lfvWv.gcFkZOjLCDTTn.7vcIm1o9kxKAwG74JLW0OeBm4oOHPX6"
+
+# required if basic auth access is set
+prometheus_scrape_auth_basic_user: "testing-auth-agent_user"
+prometheus_scrape_auth_basic_password: "testing-auth-agent_pass"
+
+# exporters also require a basic auth
+prometheus_scrape_auth_basic: yes
+
+# exporters require https access
+#prometheus_scrape_ssl: yes
+
+
+# password is : testing-auth-agent_pass
+prometheus_agent_auth_basic_pass_crypted: "$2y$10$z3qHXVTUNQWtCtckOhJYK.SXYCZdGvxDfFy2zrZm2AAwT8UagQ90C"
+
+

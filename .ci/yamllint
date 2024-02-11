@@ -1,0 +1,25 @@
+---
+
+extends: relaxed
+
+ignore: |
+  .git/**
+  **/group_vars/all/vault*
+  roles/**/templates/**
+  storage/**
+  */docker-compose.yml*
+
+
+rules:
+  line-length:
+    max: 200
+    level: warning
+  indentation: { spaces: 2, indent-sequences: whatever }
+  comments-indentation: {}
+  commas: {max-spaces-after: -1}
+  document-start: {present: true}
+  octal-values: {forbid-implicit-octal: true}
+  new-line-at-end-of-file: enable
+  empty-lines: { max-end: 2 }
+  trailing-spaces: { level: warning }
+

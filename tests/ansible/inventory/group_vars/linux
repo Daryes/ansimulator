@@ -1,0 +1,10 @@
+---
+
+# current system storage directory
+storage_root: "/etc/ansible/storage/linux"
+storage_common: "{{ storage_root }}/common"
+
+
+# root dir used to serve as project root
+project_root: /opt
+

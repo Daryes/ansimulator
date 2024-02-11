@@ -1,0 +1,5 @@
+// activate the use of a proxy / cache server
+
+Acquire::http::Proxy-Auto-Detect "/etc/apt/detect_proxy.sh";
+Acquire::https::Proxy-Auto-Detect "/etc/apt/detect_proxy.sh";
+

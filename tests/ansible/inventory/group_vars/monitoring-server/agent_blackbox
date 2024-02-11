@@ -1,0 +1,9 @@
+---
+
+# ref: https://prometheus.io/download/
+prometheus_agent_blackbox_version: "0.24.0"
+prometheus_agent_blackbox_version_hash: "sha256:81b36cece040491ac0d9995db2a0964c40e24838a03a151c3333a7dc3eef94ff"
+
+
+prometheus_agent_blackbox_install: yes
+prometheus_agent_blackbox_conf_tls_insecure_skip_verify: "false"

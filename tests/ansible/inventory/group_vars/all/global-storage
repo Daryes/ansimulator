@@ -1,0 +1,10 @@
+---
+
+ansible_root_dir: "/etc/ansible"
+
+ansible_cache_root_dir: "/server/ansible/cache"
+
+
+storage_keys: "{{ inventory_dir }}/ssh_pub_keys"
+storage_keys_envir: "{{ storage_keys }}/{{ envir_type_short }}"
+

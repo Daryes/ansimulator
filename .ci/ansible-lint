@@ -1,0 +1,17 @@
+---
+
+#exclude_paths:
+
+
+# ansible-lint >5 required
+# disable rewriting tasks (arg: --fix)
+write_list: ["none"]
+
+
+skip_list:
+  # role name
+  - role-name
+  # meta file content
+  - meta-incorrect
+  # lines length - already validated by yamllint
+  - yaml[line-length]

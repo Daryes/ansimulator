@@ -1,0 +1,15 @@
+---
+
+# required in a group file due to the group name
+
+db-postgresql_postgresql_db:
+  - db: "ci_testing"
+
+db-postgresql_postgresql_user:
+  - name: testing
+    password: "NoTestForThee"
+    conn_limit: 5
+    db: "ci_testing"
+    schema: "public"
+    privs: "ALL"
+
