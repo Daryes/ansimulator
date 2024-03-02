@@ -81,6 +81,9 @@ services:
       - target: 443
         protocol: tcp
         host_ip: "${DOCKER_HOST_IP:-127.0.0.1}"
+      - target: 3000
+        protocol: tcp
+        host_ip: "${DOCKER_HOST_IP:-127.0.0.1}"
     deploy:
       mode: replicated
       replicas: ${CENTOS_CONTAINER_COUNT}
@@ -96,6 +99,9 @@ services:
         protocol: tcp
         host_ip: "${DOCKER_HOST_IP:-127.0.0.1}"
       - target: 443
+        protocol: tcp
+        host_ip: "${DOCKER_HOST_IP:-127.0.0.1}"
+      - target: 3000
         protocol: tcp
         host_ip: "${DOCKER_HOST_IP:-127.0.0.1}"
     deploy:

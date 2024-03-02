@@ -3,7 +3,6 @@ id_rsa
 secure.yaml
 inventories/**
 roles/**
-ansible
-ansible/**
+/ansible
 # must be last
 !tests/**
