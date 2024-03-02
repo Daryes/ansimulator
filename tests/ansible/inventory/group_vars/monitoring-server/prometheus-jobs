@@ -14,7 +14,7 @@ prometheus_job_secondary_labels_static:
   - label_secondary: "_secondary_static"
   - test_label_dupe: "_secondary_static"
   - env: "dupe _secondary_static"
-  - env_char: "_secondary_static"
+  - env_char: "t"
 
 
 prometheus_job_all_labels_variable_name:
@@ -55,15 +55,15 @@ prometheus_job_web_apache:
 
 # job blackbox - website
 prometheus_job_website:
-  - { name: "apache first", url: "{{ groups['web-apache'] |first }}" }
-  - { name: "apache last",  url: "{{ groups['web-apache'] |last }}" }
-
+  - { name: "apache first server", url: "{{ groups['web-apache'] |first }}" }
+  - { name: "apache last server",  url: "{{ groups['web-apache'] |last }}" }
 
 
 # job blackbox - certificate
 prometheus_job_certificate:
-  - { name: "apache first", target: "{{ groups['web-apache'] |first }}:443" }
-  - { name: "apache last",  target: "{{ groups['web-apache'] |last }}:443" }
+  - { name: "apache first server", target: "{{ groups['web-apache'] |first }}:443" }
+  - { name: "apache last server",  target: "{{ groups['web-apache'] |last }}:443" }
+  - { name: "github.com",          target: "github.com:443" }
 
 
 # job blackbox - icmp
