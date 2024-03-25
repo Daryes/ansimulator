@@ -62,7 +62,7 @@ if [ "$BASE_SYSTEM" == "debian" ]; then
 else
     bash wrapper-packages_install.sh \
         python3 python3-pip python3-devel \
-        libpq-devel
+        postgresql-libs
 fi
 
 
