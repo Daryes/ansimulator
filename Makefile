@@ -113,6 +113,9 @@ ansible-unit-4-playbook-web-nginx-apache: ## ansible roles unit test: web-nginx 
 ansible-unit-5-playbook-monitoring: ## ansible role unit test: monitoring-prometheus* & monitoring-grafana
 	${DOCKER_EXEC_ANSIBLE_CMD} -c "${ANSIBLE_SIMUL_INVENTORY_EXEC}/playbook-test-monitoring.yml --flush-cache"
 
+ansible-unit-5b-playbook-monitoring-container: ## ansible role unit test: monitoring-cadvisor for prometheus
+	${DOCKER_EXEC_ANSIBLE_CMD} -c "${ANSIBLE_SIMUL_INVENTORY_EXEC}/playbook-test-monitoring-container.yml"
+
 ansible-unit-6-playbook-java: ## ansible role unit test: sys-java
 	${DOCKER_EXEC_ANSIBLE_CMD} -c "${ANSIBLE_SIMUL_INVENTORY_EXEC}/playbook-test-java.yml"
 

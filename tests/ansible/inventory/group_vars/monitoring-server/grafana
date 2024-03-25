@@ -39,23 +39,6 @@ grafana_plugins_install:
   - "yesoreyeram-boomtheme-panel"
 
 
-grafana_provisioning_dashboards_transferts:
-  - source: "/etc/ansible/roles/monitoring-grafana-dashboard/files/dashboards"
-    dest: "provisioning"
-    mode: "dirsync"
-
-
-grafana_provisioning_dashboards:
-  apiVersion: 1
-  providers:
-    - name: dashboards
-      type: file
-      updateIntervalSeconds: 60
-      options:
-        path: /etc/grafana/provisioning/dashboards
-        foldersFromFilesStructure: true
-
-
 grafana_config_settings:
   # required for alerting
   - { section: "unified_alerting", param: "execute_alerts",    value: "true" }
@@ -77,6 +60,13 @@ grafana_config_settings:
   - { section: "log",              param: "level",             value: "warn" }
 
 
+# monitoring exporter
+grafana_config_metrics: yes
+grafana_config_metrics_basic_auth_username: "{{ prometheus_scrape_auth_basic_user }}"
+grafana_config_metrics_basic_auth_password: "{{ prometheus_scrape_auth_basic_password }}"
+
+
+# provisioning
 grafana_provisioning_admin_login: "admin"
 grafana_provisioning_admin_password: "testing"
 
@@ -110,4 +100,21 @@ grafana_provisioning_datasources:
       basicAuthUser: "grafana_user"
       secureJsonData:
         basicAuthPassword: "grafana_pass"
+
+
+grafana_provisioning_dashboards_transferts:
+  - source: "/etc/ansible/roles/monitoring-grafana-dashboard/files/dashboards/prometheus"
+    dest: "provisioning"
+    mode: "dirsync"
+
+
+grafana_provisioning_dashboards:
+  apiVersion: 1
+  providers:
+    - name: dashboards
+      type: file
+      updateIntervalSeconds: 60
+      options:
+        path: /etc/grafana/provisioning/dashboards
+        foldersFromFilesStructure: true
 

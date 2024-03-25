@@ -37,18 +37,19 @@ prometheus_auth_basic_users:
     # pass is : grafana_pass
     pass_crypted: "$2y$10$k3lfvWv.gcFkZOjLCDTTn.7vcIm1o9kxKAwG74JLW0OeBm4oOHPX6"
 
-# required if basic auth access is set
-prometheus_scrape_auth_basic_user: "testing-auth-agent_user"
+
+# required if basic auth access is set on prometheus server
+# reusing the _agent_auth_basic as they are also installed on the prometheus server
+prometheus_scrape_auth_basic_user: "{{ prometheus_agent_auth_basic_user }}"
+prometheus_scrape_auth_basic_pass_crypted: "{{ prometheus_agent_auth_basic_pass_crypted }}"
+# must also be provided in clear text
 prometheus_scrape_auth_basic_password: "testing-auth-agent_pass"
+
 
 # exporters also require a basic auth
 prometheus_scrape_auth_basic: yes
 
+
 # exporters require https access
 #prometheus_scrape_ssl: yes
-
-
-# password is : testing-auth-agent_pass
-prometheus_agent_auth_basic_pass_crypted: "$2y$10$z3qHXVTUNQWtCtckOhJYK.SXYCZdGvxDfFy2zrZm2AAwT8UagQ90C"
-
 

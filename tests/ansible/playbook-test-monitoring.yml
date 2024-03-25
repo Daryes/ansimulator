@@ -18,7 +18,7 @@
 
   roles:
     - monitoring-prometheus_agent
-  tags: agent, agents
+  tags: agent, agents, prometheus-agent
   # variables are in the inventory under group_vars/monitoring-agent
 
 

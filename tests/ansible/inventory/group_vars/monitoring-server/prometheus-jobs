@@ -78,8 +78,9 @@ prometheus_job_icmp:
 prometheus_job_cadvisor: "{{ groups['sys-docker'] }}"
 
 # job grafana
-prometheus_job_grafana_ssl: yes
+prometheus_job_grafana_ssl: no
 prometheus_job_grafana_ssl_insecure_skip_verify: yes
 prometheus_job_grafana:
-  - { name: "grafana server", target: "{{ groups['monitoring-server'] |first }}:3000" }
+  # filter with the "linux" group to select a working grafana server
+  - { name: "grafana server", target: "{{ groups['monitoring-server'] |intersect( groups['linux'] ) |first }}:3000" }
 

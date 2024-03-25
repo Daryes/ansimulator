@@ -1,5 +1,9 @@
 ---
 
+# support different versions on multiple servers
+prometheus_agent_version_same_for_all: no
+
+
 prometheus_agent_node_version: "1.7.0"
 prometheus_agent_node_version_hash: "sha256:a550cd5c05f760b7934a2d0afad66d2e92e681482f5f57a917465b1fba3b02a6"
 
