@@ -5,6 +5,7 @@ extends: relaxed
 ignore: |
   .git/**
   **/group_vars/all/vault*
+  roles/**/files/**
   roles/**/templates/**
   storage/**
   */docker-compose.yml*
