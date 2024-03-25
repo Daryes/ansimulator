@@ -87,7 +87,8 @@ make ansible-simul-start
 # only for the first time
 make ansible-simul-validate
 ```
-Any error on validate means the containers are not started, or a problem occured with the generated ssh key, in the volume `ansible_simulator_sshkey`  
+Most errors on validate means the containers are not started, or a problem occured with the generated ssh key, in the volume `ansible_simulator_sshkey`  
+Other specific errors about `cd: /etc/ansible/: Permission denied` or `Ansible: Permission denied:` is related to the ansible directory used for the tests or the ansimulator structure missing a 755 mode on the directories. They must be world readable to be used from the containers.  
 
 
 To connect to the ansible controller :
