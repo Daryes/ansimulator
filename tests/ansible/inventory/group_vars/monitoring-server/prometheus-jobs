@@ -55,8 +55,8 @@ prometheus_job_web_apache:
 
 # job blackbox - website
 prometheus_job_website:
-  - { name: "apache first server", url: "{{ groups['web-apache'] |first }}" }
-  - { name: "apache last server",  url: "{{ groups['web-apache'] |last }}" }
+  - { name: "apache first server", url: "http://{{ groups['web-apache'] |first }}" }
+  - { name: "apache last server",  url: "http://{{ groups['web-apache'] |last }}" }
 
 
 # job blackbox - certificate
