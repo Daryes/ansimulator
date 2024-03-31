@@ -87,11 +87,11 @@ ansible-tools-compat-v2_14-update-roles:  ## update roles for ansible-core 2.14+
 
 
 ansible-syntax-1-yamllint: ## run yamllint on the ansible roles
-	@${DOCKER_EXEC_ANSIBLE_CMD} -c "yamllint -v; cd /etc/ansible && yamllint -c /opt/repo/.ci/yamllint  *.y*ml  roles/"
+	@${DOCKER_EXEC_ANSIBLE_CMD} -c "yamllint -v; cd /etc/ansible && yamllint -c /opt/repo/.ci/yamllint  roles/"
 
 ansible-syntax-2-ansiblelint: ## run ansible-lint on the ansible playbooks
 	@# set the command between ' ' and still double the $ to prevent any interpretation from make
-	${DOCKER_EXEC_ANSIBLE_CMD} -c 'ansible-lint --version; export LINT_CONF=ansible-lint; [ -z "$${ANSIBLE_VERSION##2.9*}" ] && LINT_CONF=$${LINT_CONF}-v2.9 ; cd /etc/ansible && ansible-lint --show-relpath -c /opt/repo/.ci/$$LINT_CONF  *.y*ml'
+	${DOCKER_EXEC_ANSIBLE_CMD} -c 'ansible-lint --version; export LINT_CONF=ansible-lint; [ -z "$${ANSIBLE_VERSION##2.9*}" ] && LINT_CONF=$${LINT_CONF}-v2.9 ; cd /etc/ansible && ansible-lint --show-relpath -c /opt/repo/.ci/$$LINT_CONF  roles/* '
 
 
 ansible-syntax-3-playbook-check: ## run ansible-playbook syntax check
