@@ -3,10 +3,34 @@
 apache_global_auth_user_list:
   - { user: "testing", password: "$apr1$crypted", comment: "test user" }
 
+# manage rhel/rocky which uses a complete different set of modules
+apache_global_modules_activate: >-
+  {{ [ 'rewrite', 'proxy', 'proxy_http', 'proxy_wstunnel', 'ssl' ] if ansible_os_family |lower == "debian"
+     else [ 'ssl' ]
+  }}
+
+
+apache_default_site_ssl_cert_pem: "/etc/ssl/private/conquest.worldcompany.com/conquest.worldcompany.com.pem"
+apache_default_site_ssl_cert_key: "/etc/ssl/private/conquest.worldcompany.com/conquest.worldcompany.com.key"
+
 
 web-apache_apache:
   - server_name: "testing.localhost"
     site_vhost_template: "templates/etc/apache2/sites-available/vhost-template_reverse_no_ssl.conf.j2"
     proxypass_target: "http://127.0.0.1:8080"
-    raw_settings: [ ]
+    raw_settings: []
+
+  - server_name: "conquest.worldcompany.com"
+    site_vhost_template: "templates/etc/apache2/sites-available/vhost-template.conf.j2"
+    ssl_cert_pem: "/etc/ssl/private/conquest.worldcompany.com/conquest.worldcompany.com.combined.pem"
+    ssl_cert_key: "/etc/ssl/private/conquest.worldcompany.com/conquest.worldcompany.com.key"
+    raw_settings:
+      - 'DocumentRoot "/var/www/html/"'
+      - '<Directory "/var/www/html">'
+      - '  Options None'
+      - '  Options -FollowSymlinks +Indexes'
+      - '  IndexIgnore .htaccess robots.txt'
+      - '  AllowOverride All'
+      - '  Require all granted'
+      - '</Directory>'
 
