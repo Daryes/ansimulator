@@ -116,15 +116,9 @@ ansible-unit-5-playbook-monitoring: ## ansible role unit test: monitoring-promet
 ansible-unit-5b-playbook-monitoring-container: ## ansible role unit test: monitoring-cadvisor for prometheus
 	${DOCKER_EXEC_ANSIBLE_CMD} -c "${ANSIBLE_SIMUL_INVENTORY_EXEC}/playbook-test-monitoring-container.yml"
 
-ansible-unit-6-playbook-java: ## ansible role unit test: sys-java
-	${DOCKER_EXEC_ANSIBLE_CMD} -c "${ANSIBLE_SIMUL_INVENTORY_EXEC}/playbook-test-java.yml"
-
 ansible-unit-7-playbook-dns-server: ## ansible role unit test: dns-bind
 	${DOCKER_EXEC_ANSIBLE_CMD} -c "${ANSIBLE_SIMUL_INVENTORY_EXEC}/playbook-test-dns-server.yml"
 
 ansible-unit-9-playbook-serial-over-hostgroups: ## ansible role unit test: _serial_over_hostgroups
 	${DOCKER_EXEC_ANSIBLE_CMD} -c "${ANSIBLE_SIMUL_INVENTORY_EXEC}/playbook-test-serial_over_hostgroups.yml"
-
-ansible-unit-b-playbook-mail-relay: ## ansible roles unit test: mail-postfix_relay
-	${DOCKER_EXEC_ANSIBLE_CMD} -c "${ANSIBLE_SIMUL_INVENTORY_EXEC}/playbook-test-mail.yml"
 

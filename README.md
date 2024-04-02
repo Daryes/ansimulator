@@ -64,6 +64,20 @@ They are designed to work with the [ansible-roles](https://github.com/Daryes/ans
 
 You can study them, or try them directly. For this, clone the ansible-roles repository in a separate directory,  
 then create a symlink in the simulator root named `ansible` targeting the ansible-roles root directory.  
+To put it simply :  
+```
+cd myworkdir/
+git clone https://github.com/Daryes/ansimulator.git
+git clone https://github.com/Daryes/ansible-roles.git
+cd ansimulator
+ln -s $( readlink -f ../ansible-roles ) ansible
+
+make help
+# use sudo if your user is not a member of the docker group
+make ansible-simul-docker-build
+make ansible-simul-start
+make ...
+```
 
 
 ### First run

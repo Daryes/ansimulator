@@ -25,7 +25,6 @@ fi
 # => jmespath : queries in json data
 # => pyOpenSSL : deprecated since ansible 2.9, use cryptography instead
 # => cryptography==3.* : required for ansible 2.9, <41 : requires openssl 3
-# => cryptography< 41 :  requires openssl 3+
 # => PyMySQL[rsa] : mysql
 # => psycopg2 : postgreSQL
 # 
@@ -102,12 +101,17 @@ if [ ! -z "$ANSIBLE_VAULT_PASS_FILE" ] && [ ! -s "$ANSIBLE_VAULT_PASS_FILE" ]; t
   echo "VAULT PASSKEY CHANGE ME" > "$ANSIBLE_VAULT_PASS_FILE"
 fi
 
-if [ ! -s ~/.ssh/authorized_keys ]; then
+if [ ! -d ~/.ssh ]; then
   sudo install --owner ansible --group ansible --mode 700 -d ~/.ssh
+else
   sudo chown -R ansible: ~/.ssh
-  ssh-keygen -q -b 4096 -t rsa -f ~/.ssh/id_rsa -N "" -C "ansible@docker-simulator"
-  cp -p  ~/.ssh/id_rsa.pub  ~/.ssh/authorized_keys
 fi
+if [ ! -s ~/.ssh/id_rsa ]; then
+  ssh-keygen -q -b 4096 -t rsa -f ~/.ssh/id_rsa -N "" -C "ansible@docker-simulator"
+  rm ~/.ssh/authorized_keys &>/dev/null
+fi
+if [ ! -f ~/.ssh/authorized_keys ]; then cp -p  ~/.ssh/id_rsa.pub  ~/.ssh/authorized_keys ; fi
+
 cd /etc/ansible/
 EOT
 
