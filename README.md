@@ -58,7 +58,7 @@ It must contains at least the `ansible.cfg` file.
 If it is a simlink, it can be directed to your real ansible directory. 
 
 
-**Regarding the Makefile ansible-unit-* targets :**  
+**Regarding the Makefile ansible-unit- targets :**  
 
 They are designed to work with the [ansible-roles](https://github.com/Daryes/ansible-roles) repository.  
 

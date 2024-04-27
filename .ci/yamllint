@@ -3,6 +3,8 @@
 extends: relaxed
 
 ignore: |
+  .yamllint
+  yamllint
   .git/**
   **/group_vars/all/vault*
   roles/**/files/**
