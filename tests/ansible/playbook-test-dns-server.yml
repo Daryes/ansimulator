@@ -35,7 +35,7 @@
         zone_template: "templates/etc/named/zones.d/zone-template.db.j2"
         zone_type: "db"
         email: "do-not-care@testing.local"
-        serial: 123
+        # serial: should be automatic using epoch
         ns: [ "{{ inventory_hostname }}.testing.local" ]
         mx: []
         spf: []
@@ -49,9 +49,21 @@
           - "{{ '%-29s'|format( 'a-very-long-string-enough-to-go-over.thirty-characters.to-see-what-happens' ) }} IN CNAME  ansible"
           # generate a cname entry for the first server in the mail-relay group - multiple identical CNAME records is not valid, use IP instead
           - "{{['mail  IN A     '] |product(  groups['mail-relay'] |map('extract', hostvars) |map(attribute='ansible_default_ipv4.address')  ) |map('join') |list }}"
+          # test for the automatic serial
+          - "; Automatic serial test - force the SOA file to be updated with a number close to :  {{ now(fmt='%s') }}"
+
+      # standard zone using the default.zone-empty.db template to validate the SOA as secondary template will not be triggered
+      - name: "template-no-external-soa.testing.local"
+        zone_template: "templates/etc/named/zones.d/zone-template.zone.j2"
+        zone_type: "zone"
+
+      - name: "template-no-external-soa.testing.local"
+        zone_template: "templates/etc/named/zones.d/default.zone-empty.db.j2"
+        zone_type: "db"
+        # other params : not supported by the template (empty zone)
 
       # transfer zone
-      # only for test as the transfer itself will not work due to the fictive zone
+      # only for test as the transfer itself will not work due to the simulated zone
       - name: "transfer.test.local"
         zone_template: "templates/etc/named/zones.d/transfer-template.zone.j2"
         zone_type: "zone"
