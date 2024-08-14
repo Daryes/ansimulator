@@ -70,6 +70,11 @@ sys-docker
 ci-ansible-master
 
 
+[dns-inventory-parsing]
+ci-test-centos-1
+ci-test-debian-1
+
+
 [web-apache]
 ci-test-centos-1
 ci-test-debian-1

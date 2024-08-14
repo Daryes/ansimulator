@@ -1,0 +1,22 @@
+---
+
+# validation for the inventory parsing capability
+
+dns-inventory-parsing_bind_zones_extra:
+  - name: "testing.local"
+    zone_type: "db"
+    records_raw:
+      - "; these lines should appear for each server in the group dns-parsing-test"
+      - "test1          IN A     127.0.0.1"
+      - "testing-parse  IN CNAME ci-ansible-master"
+
+
+  - name: "should.not.appear"
+    zone_type: "db"
+    records_raw:
+      - "THIS-IS-AN-ERROR.IF.YOU-SEE-THIS  IN A 127.0.0.1"
+
+
+  - name: "should be ignored"
+    # nothing else
+
