@@ -3,10 +3,10 @@
 
 ## Description
 
-Ansimulator allows to simulate using containers  a complete infrastructure contaning an ansible controller and multiple test servers.  
-It has been structured to allow being used locally on your computer, under WSL, or on a server, and in a CI.
+Ansimulator allows to simulate using containers a complete infrastructure with an ansible controller and multiple test servers.  
+It has been structured to be used locally on your computer, under WSL, or on a server, and in a CI.
 
-The ansible container has an acces to the subdirectory `./ansible/` containing all roles and playbooks.  
+The ansible container has an access to the subdirectory `./ansible/` containing all roles and playbooks.  
 Depending of docker versions, this directory can be a symlink, and will work as desired.  
 A `test` directory is provided, with both a custom inventory and testing playbooks.
 
