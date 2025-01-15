@@ -79,6 +79,9 @@ make ansible-simul-start
 make ...
 ```
 
+Notice: the provided inventory uses `-` in the group names on purpose, ensuring explicit access to them and prevent any variable conflict.  
+Ansible will raise a non-blocking warning about it, which can be hidden by adding this line to the ansible.cfg file,  [defaults] section : `force_valid_group_names = ignore`
+
 
 ### First run
 
@@ -91,6 +94,9 @@ This step will take some minutes to create the 2 images for the Debian and Cento
 Both Debian and Rocky Linux official images will be used and retrieved from dockerhub.  
 When the images have been created, using this step is not required anymore.
 
+To alleviate any trouble for accessing the directories, the ansible user in the containers will reuse the owner UID of the Makefile directory.  
+As such, it is not recommended to have Root as the owner of the ansimulator files.
+
 
 ### Starting the simulator and common usage
 
@@ -98,11 +104,11 @@ To start the containers :
 ```
 make ansible-simul-start
 
-# only for the first time
 make ansible-simul-validate
 ```
 Most errors on validate means the containers are not started, or a problem occured with the generated ssh key, in the volume `ansible_simulator_sshkey`  
-Other specific errors about `cd: /etc/ansible/: Permission denied` or `Ansible: Permission denied:` is related to the ansible directory used for the tests or the ansimulator structure missing a 755 mode on the directories. They must be world readable to be used from the containers.  
+Other specific errors about `cd: /etc/ansible/: Permission denied` or `Ansible: Permission denied:` is related to the directory access.  
+Either the ansible directory with the roles used for the tests, or the ansimulator structure is missing a 755 mode on the directories. They must be world readable to be used from the containers.  
 
 
 To connect to the ansible controller :
@@ -116,21 +122,24 @@ For example, to connect to ci-test-debian-1, simply use : `ssh ci-test-debian-1`
 Notice : aside the ansible container, all other containers will only show the docker generated ID for their hostname.  
 This is a limitation of the deploy module from Docker, and cannot actually be changed.
 
+
 ### Executing the tests
 
 Use the `make` command to list the possible targets.  
 All the tests can be executed with :
 ```
-ansible-unit-<desired target>
+make ansible-unit-<desired target>
 ```
 It is highly possible the tab key for completion is usable with Make.
 
 
-The ansible's `--diff` mode activated by default in the Makefile can be disabled with :
+The ansible's `--diff` mode is activated by default in the Makefile, and can be disabled with :
 ```
-ansible-unit-<target>  DIFF=""
+make ansible-unit-<target>  DIFF=""
 ```
-Notice: you can use DIFF to pass other arguments to ansible.
+
+Notice: you can use the DIFF parameter to pass other arguments to ansible.  
+If you still need diff itself, use it like this : `DIFF="--diff --tag ..."`
 
 
 ### Stop the simulator
@@ -139,7 +148,7 @@ This will stop and remove the containers, cleaning everything which was installe
 ```
 make ansible-simul-stop
 ```
-This will also delete the docker volume `ci_ansible_simulator_temp_docker_vol` to prevent an unwanted growth in disk usage.
+This will also delete the docker volume `ci_ansible_simulator_temp_docker_vol`
 
 
 ---
