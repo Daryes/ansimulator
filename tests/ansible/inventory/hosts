@@ -66,6 +66,11 @@ ci-test-centos-1
 sys-docker
 
 
+[ci-jenkins]
+[ci-jenkins:children]
+sys-java
+
+
 [dns-server]
 ci-ansible-master
 

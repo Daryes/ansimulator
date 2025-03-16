@@ -35,7 +35,6 @@ grafana_data_dir: "/server/grafana/data"
 grafana_plugins_install:
   - "vonage-status-panel"
   - "natel-discrete-panel"
-  - "mxswat-separator-panel"
   - "yesoreyeram-boomtheme-panel"
 
 
