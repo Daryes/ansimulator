@@ -1,0 +1,26 @@
+# Makefile - unit tests for Ansimulator
+
+test-unit-1-playbook-certificates: ## ansible role unit test: certificate-generate_ca + certificate-push-trusted + certificate-generate
+	${DOCKER_EXEC_ANSIBLE_CMD} -c "${ANSIBLE_SIMUL_INVENTORY_EXEC}/playbook-test-certificate-generate_ca-push-generate.yml"
+
+test-unit-2-playbook-docker: ## ansible role unit test: sys-docker
+	${DOCKER_EXEC_ANSIBLE_CMD} -c "${ANSIBLE_SIMUL_INVENTORY_EXEC}/playbook-test-docker.yml"
+
+test-unit-3-playbook-db: ## ansible role unit test: db-mysql & db-postgresql
+	${DOCKER_EXEC_ANSIBLE_CMD} -c "${ANSIBLE_SIMUL_INVENTORY_EXEC}/playbook-test-db.yml"
+
+test-unit-4-playbook-web-nginx-apache: ## ansible roles unit test: web-nginx & web-apache
+	${DOCKER_EXEC_ANSIBLE_CMD} -c "${ANSIBLE_SIMUL_INVENTORY_EXEC}/playbook-test-web.yml"
+
+test-unit-5-playbook-monitoring: ## ansible role unit test: monitoring-prometheus* & monitoring-grafana
+	${DOCKER_EXEC_ANSIBLE_CMD} -c "${ANSIBLE_SIMUL_INVENTORY_EXEC}/playbook-test-monitoring.yml --flush-cache"
+
+test-unit-5b-playbook-monitoring-container: ## ansible role unit test: monitoring-cadvisor for prometheus
+	${DOCKER_EXEC_ANSIBLE_CMD} -c "${ANSIBLE_SIMUL_INVENTORY_EXEC}/playbook-test-monitoring-container.yml"
+
+test-unit-7-playbook-dns-server: ## ansible role unit test: dns-bind
+	${DOCKER_EXEC_ANSIBLE_CMD} -c "${ANSIBLE_SIMUL_INVENTORY_EXEC}/playbook-test-dns-server.yml"
+
+test-unit-9-playbook-serial-over-hostgroups: ## ansible role unit test: _serial_over_hostgroups
+	${DOCKER_EXEC_ANSIBLE_CMD} -c "${ANSIBLE_SIMUL_INVENTORY_EXEC}/playbook-test-serial_over_hostgroups.yml"
+

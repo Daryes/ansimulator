@@ -1,0 +1,13 @@
+# Makefile - static tests for Ansimulator
+
+test-syntax-1-yamllint: ## run yamllint on the ansible roles
+	@${DOCKER_EXEC_ANSIBLE_CMD} -c "yamllint -v; cd /etc/ansible && yamllint -c /opt/repo/.ci/yamllint  roles/"
+
+test-syntax-2-ansiblelint: ## run ansible-lint on the ansible playbooks
+	@# set the command between ' ' and still double the $ to prevent any interpretation from make
+	@# able to do a dual output with std and --*-file
+	${DOCKER_EXEC_ANSIBLE_CMD} -c 'ansible-lint --version; export LINT_CONF=ansible-lint; [ -z "$${ANSIBLE_VERSION##2.9*}" ] && LINT_CONF=$${LINT_CONF}-v2.9 ; cd /etc/ansible/ && ansible-lint -c /opt/repo/.ci/$$LINT_CONF --project-dir=. --show-relpath  --offline --sarif-file=/tmp/ansible-lint.sarif -v  *.yml roles/** '
+
+test-syntax-3-playbook-check: ## run ansible-playbook syntax check
+	@${DOCKER_EXEC_ANSIBLE_CMD} -c "cd /etc/ansible && ansible-playbook --syntax-check -i ${ANSIBLE_SIMUL_INVENTORY_ON_SERVER}  *.yml"
+

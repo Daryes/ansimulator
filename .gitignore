@@ -4,5 +4,6 @@ secure.yaml
 inventories/**
 roles/**
 /ansible
+Makefile.override
 # must be last
 !tests/**

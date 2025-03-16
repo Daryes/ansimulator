@@ -1,10 +1,10 @@
 .PHONY: no_targets__ all list help
 .DEFAULT_GOAL=help
 list: ## Show all the existing targets of this Makefile
-	@sh -c "$(MAKE) -p no_targets__ 2>/dev/null | awk -F':' '/^[a-zA-Z0-9][^\$$#\/\\t=]*:([^=]|$$)/ {split(\$$1,A,/ /);for(i in A)print A[i]}' | grep -v '__\$$' | sort -u"
+	@sh -c "$(MAKE) -p no_targets__ 2>/dev/null | awk -F':' '/^[a-zA-Z0-9][^\$$#\/\\t=]*:([^=]|$$)/ {split(\$$1,A,/ /);for(i in A)print A[i]}' | egrep -v '(__\$$|^Makefile.*)' | sort -u"
 
 help: ## Show the targets and their description (this screen)
-	@grep -E '^[a-zA-Z0-9_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
+	@grep --no-filename -E '^[a-zA-Z0-9_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort -h | awk 'BEGIN {FS = ": .*?## "}; {printf "\033[36m%-40s\033[0m %s\n", $$1, $$2}'
 
 
 # Global settings -----------------------------------
@@ -32,15 +32,16 @@ ANSIBLE_MASTER_CONTAINER=ci-ansible-master
 ANSIBLE_MASTER_INVENTORY_GROUP_ALL=domain
 
 # using $$var make their expansion delayed when they are used in the build: target
-DOCKER_BUILD_CMD_COMMON_ARGS=--progress plain  \
+DOCKER_BUILD_CMD_COMMON_ARGS= --build-arg ANSIBLE_USER_UID=$$ANSIBLE_USER_UID \
 	--build-arg IMAGE_DEBIAN_NAME=$$IMAGE_DEBIAN_REF_NAME  --build-arg IMAGE_DEBIAN_VERSION=$$IMAGE_DEBIAN_REF_VERSION \
 	--build-arg IMAGE_CENTOS_NAME=$$IMAGE_CENTOS_REF_NAME  --build-arg IMAGE_CENTOS_VERSION=$$IMAGE_CENTOS_REF_VERSION \
-	--build-arg ANSIBLE_USER_UID=$$ANSIBLE_USER_UID \
-	--build-arg PKG_APT_PROXY="$${PKG_APT_PROXY:-}" --build-arg PKG_YUM_PROXY="$${PKG_YUM_PROXY:-}"  \
+	--build-arg PKG_DEB_PROXY="$${PKG_DEB_PROXY:-}" --build-arg PKG_RPM_PROXY="$${PKG_RPM_PROXY:-}"  \
 	${ANSIBLE_SIMUL_DOCKERFILE_ROOTDIR}/
 
 ANSIBLE_SIMUL_COMPOSE_CMD=docker-compose -f ${ANSIBLE_SIMUL_COMPOSE}  --env-file ${ANSIBLE_SIMUL_COMPOSE_ENV}
-DOCKER_EXEC_ANSIBLE_CMD=docker exec -it --user ansible ${ANSIBLE_MASTER_CONTAINER} /bin/bash
+DOCKER_EXEC_BASE_CMD=docker exec -t --user ansible
+DOCKER_EXEC_ANSIBLE_CMD=${DOCKER_EXEC_BASE_CMD} ${ANSIBLE_MASTER_CONTAINER} /bin/bash
+DOCKER_EXEC_ANSIBLE_INTERACTIVE=${DOCKER_EXEC_BASE_CMD} -i ${ANSIBLE_MASTER_CONTAINER} /bin/bash
 
 
 ansible-simul-docker-build: ## build the ansible simulator docker images with ssh support - required one time before any compose command
@@ -48,7 +49,8 @@ ansible-simul-docker-build: ## build the ansible simulator docker images with ss
 	@# the images are pulled instead of being stored into the builder cache which is volatile
 	set -eux ;\
 		source ${ANSIBLE_SIMUL_COMPOSE_ENV} ;\
-		ANSIBLE_USER_UID=$$( stat --format "%u" . );\
+		ANSIBLE_USER_UID=$$( stat --format "%u" . ) ;\
+		if [ -z "$$ANSIBLE_USER_UID" ] || [ $$ANSIBLE_USER_UID -eq 0 ]; then ANSIBLE_USER_UID=421; fi ;\
 		docker pull $$IMAGE_DEBIAN_REF_NAME:$$IMAGE_DEBIAN_REF_VERSION  ;\
 		docker pull $$IMAGE_CENTOS_REF_NAME:$$IMAGE_CENTOS_REF_VERSION  ;\
 		docker build -t $$IMAGE_CENTOS_CI --build-arg TARGET_DIST=redhat ${DOCKER_BUILD_CMD_COMMON_ARGS} ;\
@@ -72,8 +74,8 @@ ansible-simul-status: ## status of the docker containers using compose
 
 
 ansible-simul-connect: ## connect to the local ansible master container
-	@# the error 130 happens on a normal logout when an error occured before or ctrl-c was pressed
-	@${DOCKER_EXEC_ANSIBLE_CMD} -l; if [ $$? -eq 130 ]; then exit 0; fi
+	@# the error 130 happens on a normDOCKER_EXEC_ANSIBLE_INTERACTIVEDOCKER_EXEC_ANSIBLE_INTERACTIVEDOCKER_EXEC_ANSIBLE_INTERACTIVEDOCKER_EXEC_ANSIBLE_INTERACTIVEDOCKER_EXEC_ANSIBLE_INTERACTIVEDOCKER_EXEC_ANSIBLE_INTERACTIVEDOCKER_EXEC_ANSIBLE_INTERACTIVEal logout when an error occured before or ctrl-c was pressed
+	@${DOCKER_EXEC_ANSIBLE_INTERACTIVE} -l; if [ $$? -eq 130 ]; then exit 0; fi
 
 ansible-simul-validate: ## verify the communication from ansible master to the other containers using ssh
 	@${DOCKER_EXEC_ANSIBLE_CMD} -i -c "source ~/.bashrc; echo "" > ~/.ssh/known_hosts; exit 2>/dev/null"
@@ -86,39 +88,12 @@ ansible-tools-compat-v2_14-update-roles:  ## update roles for ansible-core 2.14+
 	@echo "Roles updated"
 
 
-ansible-syntax-1-yamllint: ## run yamllint on the ansible roles
-	@${DOCKER_EXEC_ANSIBLE_CMD} -c "yamllint -v; cd /etc/ansible && yamllint -c /opt/repo/.ci/yamllint  roles/"
+# includes ------------------------------------------
 
-ansible-syntax-2-ansiblelint: ## run ansible-lint on the ansible playbooks
-	@# set the command between ' ' and still double the $ to prevent any interpretation from make
-	${DOCKER_EXEC_ANSIBLE_CMD} -c 'ansible-lint --version; export LINT_CONF=ansible-lint; [ -z "$${ANSIBLE_VERSION##2.9*}" ] && LINT_CONF=$${LINT_CONF}-v2.9 ; cd /etc/ansible && ansible-lint --show-relpath -c /opt/repo/.ci/$$LINT_CONF  roles/* '
+-include Makefile.test-static
+-include Makefile.test-unit
 
 
-ansible-syntax-3-playbook-check: ## run ansible-playbook syntax check
-	@${DOCKER_EXEC_ANSIBLE_CMD} -c "cd /etc/ansible && ansible-playbook --syntax-check -i ${ANSIBLE_SIMUL_INVENTORY_ON_SERVER}  *.yml"
-
-
-ansible-unit-1-playbook-certificates: ## ansible role unit test: certificate-generate_ca + certificate-push-trusted + certificate-generate
-	${DOCKER_EXEC_ANSIBLE_CMD} -c "${ANSIBLE_SIMUL_INVENTORY_EXEC}/playbook-test-certificate-generate_ca-push-generate.yml"
-
-ansible-unit-2-playbook-docker: ## ansible role unit test: sys-docker
-	${DOCKER_EXEC_ANSIBLE_CMD} -c "${ANSIBLE_SIMUL_INVENTORY_EXEC}/playbook-test-docker.yml"
-
-ansible-unit-3-playbook-db: ## ansible role unit test: db-mysql & db-postgresql
-	${DOCKER_EXEC_ANSIBLE_CMD} -c "${ANSIBLE_SIMUL_INVENTORY_EXEC}/playbook-test-db.yml"
-
-ansible-unit-4-playbook-web-nginx-apache: ## ansible roles unit test: web-nginx & web-apache
-	${DOCKER_EXEC_ANSIBLE_CMD} -c "${ANSIBLE_SIMUL_INVENTORY_EXEC}/playbook-test-web.yml"
-
-ansible-unit-5-playbook-monitoring: ## ansible role unit test: monitoring-prometheus* & monitoring-grafana
-	${DOCKER_EXEC_ANSIBLE_CMD} -c "${ANSIBLE_SIMUL_INVENTORY_EXEC}/playbook-test-monitoring.yml --flush-cache"
-
-ansible-unit-5b-playbook-monitoring-container: ## ansible role unit test: monitoring-cadvisor for prometheus
-	${DOCKER_EXEC_ANSIBLE_CMD} -c "${ANSIBLE_SIMUL_INVENTORY_EXEC}/playbook-test-monitoring-container.yml"
-
-ansible-unit-7-playbook-dns-server: ## ansible role unit test: dns-bind
-	${DOCKER_EXEC_ANSIBLE_CMD} -c "${ANSIBLE_SIMUL_INVENTORY_EXEC}/playbook-test-dns-server.yml"
-
-ansible-unit-9-playbook-serial-over-hostgroups: ## ansible role unit test: _serial_over_hostgroups
-	${DOCKER_EXEC_ANSIBLE_CMD} -c "${ANSIBLE_SIMUL_INVENTORY_EXEC}/playbook-test-serial_over_hostgroups.yml"
+# Must be at the end
+-include Makefile.override
 
