@@ -11,8 +11,9 @@ Depending of docker versions, this directory can be a symlink, and will work as 
 A `test` directory is provided, with both a custom inventory and testing playbooks.
 
 All containers can be reached using ssh, and have the necessary requirements allowing to have both systemd and Docker running together.  
-Docker must be installed in the containers, and is supported on any Debian version, but only on Centos/Rocky/Alma 9+  
-When terminated, the containers will be cleaned completely
+Docker can be installed in the containers and will be fully usable. This is supported on any Debian version, but Centos/Rocky/Alma will requires at least 9+.  
+
+When terminated, the containers will be cleaned completely.
 
 
 ---
@@ -20,24 +21,26 @@ When terminated, the containers will be cleaned completely
 
 Available topics :
 * Usage (next section)
-* [Requirements](doc/requirements.md)
-* [Configuration](doc/config.md)
-* [Appendix & faq](doc/appendix.md)
+* [Requirements](doc/requirements.md) (dedicated page)
+* [Configuration](doc/config.md) (dedicated page)
+* [Appendix & faq](doc/appendix.md) (dedicated page)
 
 
 ---
 ## Usage
 
 All actions are controlled using the `Makefile`.  
-To list all the targets and their help, at the simulator root, simply use the command :
+To list all the targets and their help, at the simulator root directory, simply use the command :
 ```
 make
 ```
+An integrated help is available for each command.
 
-The usual usage sequence using `make` is :  
+
+To start the simulator, the usual usage sequence using `make` is :  
 * ansible-simul-start
 * ansible-simul-validate
-* and either `ansible-simul-connect` or running some of the `ansible-unit-*` target.  
+* and either `ansible-simul-connect` or running some of the `test-unit-*` target.  
 
 Then `ansible-simul-stop` when done to shut down the containers.
 
@@ -58,7 +61,7 @@ It must contains at least the `ansible.cfg` file.
 If it is a simlink, it can be directed to your real ansible directory. 
 
 
-**Regarding the Makefile ansible-unit- targets :**  
+**Regarding the Makefile test-unit- targets :**  
 
 They are designed to work with the [ansible-roles](https://github.com/Daryes/ansible-roles) repository.  
 
@@ -76,6 +79,7 @@ make help
 # use sudo if your user is not a member of the docker group
 make ansible-simul-docker-build
 make ansible-simul-start
+make ansible-simul-validate
 make ...
 ```
 
@@ -128,14 +132,14 @@ This is a limitation of the deploy module from Docker, and cannot actually be ch
 Use the `make` command to list the possible targets.  
 All the tests can be executed with :
 ```
-make ansible-unit-<desired target>
+make test-unit-<desired target>
 ```
 It is highly possible the tab key for completion is usable with Make.
 
 
 The ansible's `--diff` mode is activated by default in the Makefile, and can be disabled with :
 ```
-make ansible-unit-<target>  DIFF=""
+make test-unit-<target>  DIFF=""
 ```
 
 Notice: you can use the DIFF parameter to pass other arguments to ansible.  
@@ -154,5 +158,6 @@ This will also delete the docker volume `ci_ansible_simulator_temp_docker_vol`
 ---
 ## Licence
 
-Author: HAL - CC-BY-4.0
+Author: HAL - CC-BY-4.0  
+Thanks to C.C-E for the Makefile list / help trick
 
