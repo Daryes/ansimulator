@@ -1,17 +1,68 @@
 ---
+# ref: https://ansible.readthedocs.io/projects/lint/configuring/
+# ref: https://ansible.readthedocs.io/projects/lint/rules/
 
-#exclude_paths:
+# supported values:  min, basic, moderate,safety, shared, production
+profile: production
+
+
+# Offline mode disables installation of requirements.yml and schema refreshing
+offline: true
 
 
 # ansible-lint >5 required
-# disable rewriting tasks (arg: --fix)
+# disable rewriting tasks (block the arg: --fix)
 write_list: ["none"]
+
+
+# variable naming
+var_naming_pattern: '^[a-z_][a-zA-Z0-9_]*$'
+
+
+# exclude some files and directories
+exclude_paths:
+  - "**/files/**"
+
+
+# rules not activated as default
+# enable_list:
 
 
 skip_list:
   # role name
   - role-name
-  # meta file content
+  # meta file content - does known recognize the "authors" tag while still valid
   - meta-incorrect
-  # lines length - already validated by yamllint
+  # lines length & number - already validated by yamllint
   - yaml[line-length]
+  - yaml[empty-lines]
+  # dafuq ? asking for 3 spaces indentation or from 2 to 6
+  - yaml[indentation]
+  # does not like using extra spaces for clarity
+  - yaml[commas]
+  - yaml[brackets]
+  - jinja[spacing]
+  # yes or no using only true or false
+  - yaml[truthy]
+  # modules with only the short name OR the full.collection.module format ?
+  - fqcn[action-core]
+  - fqcn[action]
+  # do not ask for extra clutter
+  - no-free-form
+  # "shell" has the path and other informations that "command" has not
+  - command-instead-of-shell
+  # not all "shell" or "cmd" tasks requires a when
+  - no-changed-when
+  # allow templating not only at the end in tasks "name:"
+  - name[template]
+  # and do not start bothering for the first letter of a task name in uppercase
+  - name[casing]
+  # requires "common_" as prefix for role variable naming but no way to instead enforce naming like "role_" for role constants and "task_" for role variables
+  - var-naming[no-role-prefix]
+  # learn how local_action (which is not deprecated, btw) will not have problem with the python interpreter when using delegate_to localhost - see ansible-collections/ansible.posix/issues/492
+  - deprecated-local-action
+  # the epitome of tangible insanity or extreme totalitarism, if not both. I'm still baffled this rule was even created, and even more it still exists as of today
+  - single-entry-point
+  # micro-managing is tiresome
+  - risky-file-permissions
+
