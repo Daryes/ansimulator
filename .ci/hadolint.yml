@@ -1,0 +1,17 @@
+---
+
+# ref: https://github.com/hadolint/hadolint
+ignored:
+  # Use WORKDIR to switch to a directory => not usable when the directory must be create before or is temporary
+  - DL3003
+  # Pin versions in apt-get install => not applicable for a complete image
+  - DL3008
+  # Avoid additional packages by specifying `--no-install-recommends` => global configuration for apt in the image
+  - DL3015
+  # - SC1097 # shouldn't occur
+  # In POSIX sh, == in place of = is undefined => a subimage reusing the implicit SHELL=/bin/bash cannot be detected
+  - SC2039
+  # Use "${var:?}" to ensure this never expands to / . => duplicate of SC2086
+  - SC2115
+
+
