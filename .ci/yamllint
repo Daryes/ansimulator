@@ -6,7 +6,7 @@ ignore: |
   .yamllint
   yamllint
   .git/**
-  **/group_vars/all/vault*
+  inventories/**
   roles/**/files/**
   roles/**/templates/**
   storage/**
@@ -21,7 +21,7 @@ rules:
   comments-indentation: {}
   commas: {max-spaces-after: -1}
   document-start: {present: true}
-  octal-values: {forbid-implicit-octal: true}
+  octal-values: {forbid-implicit-octal: true, forbid-explicit-octal: true}
   new-line-at-end-of-file: enable
   empty-lines: { max-end: 2 }
   trailing-spaces: { level: warning }
