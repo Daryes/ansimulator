@@ -7,14 +7,46 @@ cd $( dirname $0 )
 # The variables *_VERSION and ANSIBLE_USER_UID come from the docker build argument 
 ANSIBLE_HOME_DIR=/home/ansible
 
-
 ANSIBLE_PACKAGE_NAME=ansible-core
+ANSIBLE_PYTHON_PACKAGES_DEB="python3 python3-pip python3-virtualenv python3-dev"
+ANSIBLE_PYTHON_PACKAGES_RPM="python3 python3-pip python3-devel"
+ANSIBLE_PYTHON_CMD="python3"
+ANSIBLE_PIP_EXTRA_ARGS=""
 ANSIBLE_PIP_DEPS_CRYPTO_VERSION="<41"
-if echo "$ANSIBLE_VERSION" | egrep -q '^2\.9\.'; then
+ANSIBLE_PIP_DEPS_PSYCOPG_PACKAGE="psycopg2-binary"
+
+if [ "$BASE_SYSTEM" == "debian" ]; then
+  ANSIBLE_PIP_EXTRA_ARGS="--break-system-packages"
+fi
+
+
+case "$ANSIBLE_VERSION" in
+
+  2.9.*)
     ANSIBLE_PACKAGE_NAME=ansible
     ANSIBLE_PIP_DEPS_CRYPTO_VERSION='==3.*'
     ANSIBLE_LINT_VERSION="4.3.*  rich<11.0.0"
-fi
+    ANSIBLE_PIP_DEPS_PSYCOPG_PACKAGE="psycopg2"
+    ANSIBLE_PIP_EXTRA_ARGS=""
+    ;;
+
+  2.1[45].*)
+    ANSIBLE_LINT_VERSION="6.*"
+    ANSIBLE_PIP_EXTRA_ARGS=""
+    ;;
+
+  2.16.*)
+    # no release available yet for Rocky with python3 >= 3.10
+    if [ "$BASE_SYSTEM" == "redhat" ]; then 
+      if grep -q -i --fixed-strings 'VERSION_ID="9.' /etc/os-release; then
+        ANSIBLE_PYTHON_PACKAGES_RPM="python3.11 python3.11-pip python3.11-devel"
+        shopt -s expand_aliases
+        alias python3=/usr/bin/python3.11
+      fi
+    fi
+    ;;
+
+esac
 
 if [ ! -z "$ANSIBLE_LINT_VERSION" ]; then
     ANSIBLE_LINT_VERSION="==$ANSIBLE_LINT_VERSION";
@@ -24,15 +56,15 @@ fi
 # => netaddr : ip netmask calculation
 # => jmespath : queries in json data
 # => pyOpenSSL : deprecated since ansible 2.9, use cryptography instead
-# => cryptography==3.* : required for ansible 2.9, <41 : requires openssl 3
+# => cryptography==3.* : required for ansible 2.9, 41+ : requires openssl 3
 # => PyMySQL[rsa] : mysql
 # => psycopg2 : postgreSQL
 # 
-ANSIBLE_PIP_DEPS="httplib2 six cryptography$ANSIBLE_PIP_DEPS_CRYPTO_VERSION netaddr jmespath PyMySQL[rsa] psycopg2 yamllint"
+ANSIBLE_PIP_DEPS="httplib2 six cryptography$ANSIBLE_PIP_DEPS_CRYPTO_VERSION netaddr jmespath PyMySQL[rsa] $ANSIBLE_PIP_DEPS_PSYCOPG_PACKAGE yamllint"
 
 
 # ansible collections to install
-ANSIBLE_COLLECTIONS="ansible.netcommon ansible.utils ansible.posix community.general community.crypto community.mysql community.postgresql"
+ANSIBLE_COLLECTIONS="ansible.netcommon ansible.utils ansible.posix ansible.windows community.general community.crypto community.mysql community.postgresql"
 
 
 # ansible user creation and sudo rights
@@ -48,19 +80,17 @@ install --owner ansible --group ansible --mode 0755 -d /opt/ansible
 
 # manage python version requirement
 # libpq => psycopg2 requirement
-# ansible 2.9 => python 3.5 is the minimum, 3.9 is supported
-# ansible 2.15 => python 3.9 minimum
 # notice : when using another python than the one integrated in the system, change in the  "ansible/inventory/hosts" inventory
 # the following information in the ansible group => ansible_python_interpreter: "/path/to/python"
 
 if [ "$BASE_SYSTEM" == "debian" ]; then
     bash wrapper-packages_install.sh \
-        python3 python3-pip python3-virtualenv python3-dev \
+        ${ANSIBLE_PYTHON_PACKAGES_DEB} \
         libpq-dev
 
 else
     bash wrapper-packages_install.sh \
-        python3 python3-pip python3-devel \
+        ${ANSIBLE_PYTHON_PACKAGES_RPM} \
         postgresql-libs
 fi
 
@@ -78,11 +108,11 @@ bash wrapper-packages_install.sh \
 # ref: https://docs.ansible.com/ansible-core/devel/installation_guide/intro_installation.html#installing-and-upgrading-ansible-with-pip
 # TODO: switch to the ansible user and create a virtualenv
 export PIP_ROOT_USER_ACTION=ignore
-python3 -m pip install --upgrade --no-cache pip wheel
-python3 -m pip install --no-cache $ANSIBLE_PIP_DEPS
-python3 -m pip install --no-cache $ANSIBLE_PACKAGE_NAME==$ANSIBLE_VERSION
+python3 -m pip install --upgrade --no-cache $ANSIBLE_PIP_EXTRA_ARGS pip wheel
+python3 -m pip install --no-cache ${ANSIBLE_PIP_EXTRA_ARGS}  $ANSIBLE_PIP_DEPS
+python3 -m pip install --no-cache ${ANSIBLE_PIP_EXTRA_ARGS} "$ANSIBLE_PACKAGE_NAME==$ANSIBLE_VERSION"
 
-python3 -m pip install --no-cache ansible-lint${ANSIBLE_LINT_VERSION}
+python3 -m pip install --no-cache ${ANSIBLE_PIP_EXTRA_ARGS} "ansible-lint${ANSIBLE_LINT_VERSION}"
 
 
 # ansible: collections installation
