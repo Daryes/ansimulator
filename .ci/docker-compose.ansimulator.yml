@@ -1,6 +1,4 @@
 ---
-version: "3.4"
-
 
 # systemd requirements
 # ref: https://developers.redhat.com/blog/2014/05/05/running-systemd-within-docker-container
