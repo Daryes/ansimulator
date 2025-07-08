@@ -7,7 +7,7 @@ x-service-systemd: &conf-systemd
     net.unix.max_dgram_qlen: 512
   cgroup: host
   security_opt:
-    - seccomp:unconfined
+    - seccomp=unconfined
   cap_add:
     - SYS_ADMIN
   tmpfs:
@@ -15,26 +15,27 @@ x-service-systemd: &conf-systemd
     - /run/lock
 
 
-x-service-centos: &img-centos
+x-service=environment: &conf-environment
   environment:
-    - ANSIBLE_VAULT_PASS_FILE=${ANSIBLE_VAULT_PASS_FILE}
+    - ANSIBLE_VAULT_PASSWORD_FILE=${ANSIBLE_VAULT_PASSWORD_FILE}
+
+
+x-service-centos: &img-centos
   image: ${IMAGE_CENTOS_CI}
   networks:
     - ansible_simulator
   # DinD requirement
   privileged: true
-  <<: *conf-systemd
+  <<: [ *conf-systemd, *conf-environment ]
 
 
 x-service-debian: &img-debian
-  environment:
-    - ANSIBLE_VAULT_PASS_FILE=${ANSIBLE_VAULT_PASS_FILE}
   image: ${IMAGE_DEBIAN_CI}
   networks:
     - ansible_simulator
   # DinD requirement
   privileged: true
-  <<: *conf-systemd
+  <<: [ *conf-systemd, *conf-environment ]
 
 
 x-volume: &volume-tmpl
@@ -80,6 +81,9 @@ services:
         protocol: tcp
         host_ip: "${DOCKER_HOST_IP:-127.0.0.1}"
       - target: 3000
+        protocol: tcp
+        host_ip: "${DOCKER_HOST_IP:-127.0.0.1}"
+      - target: 5080
         protocol: tcp
         host_ip: "${DOCKER_HOST_IP:-127.0.0.1}"
     deploy:
