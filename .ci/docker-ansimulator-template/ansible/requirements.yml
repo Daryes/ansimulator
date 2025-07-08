@@ -1,0 +1,20 @@
+---
+
+# This file lists all the required external requirements (collections, roles, ...)
+# usage:
+#    ansible-galaxy collection install -r requirements.yml
+#    ansible-galaxy role install --force -r requirements.yml --roles-path /etc/ansible/roles
+
+collections:
+  # ansible collections: https://docs.ansible.com/ansible/latest/collections/ansible/index.html
+  - ansible.netcommon
+  - ansible.utils
+  - ansible.posix
+  - ansible.windows
+  - community.general
+  - community.crypto
+  - community.mysql
+  - community.postgresql
+
+
+roles: []

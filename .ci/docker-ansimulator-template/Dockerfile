@@ -121,17 +121,10 @@ RUN bash "$INSTALL_SCRIPTS/$INSTALL_MODULE_NAME/install.sh" && rm -rf "$INSTALL_
 # ansible-core 2.16 : Python 3.10-3.12	ansible-lint=24+	ansible-playbook-grapher=2+
 
 
-# .* is required for the latest sub-version instead of an automatic .0 version
+# .* is required for the latest sub-version otherwise the .0 version will be automatically selected
 # Warning : update also the compose.env file for a system release version supporting natively the related python version.
 #ENV ANSIBLE_VERSION=2.9.*
 ENV ANSIBLE_VERSION=2.16.*
-
-# set to empty for the latest version -  will be automatically downgraded to 4.3.7 for ansible 2.9
-ENV ANSIBLE_LINT_VERSION=
-
-# set to empty for the latest version -  will be automatically downgraded to 1.0.0.dev4 for ansible 2.9
-ENV ANSIBLE_PLAYBOOK_GRAPHER_VERSION=
-
 
 # ansible user uid - set as ARG to allow changing the value
 ARG ANSIBLE_USER_UID=421
@@ -139,8 +132,12 @@ ARG ANSIBLE_USER_UID=421
 
 ENV INSTALL_MODULE_NAME="ansible"
 COPY wrapper-*.sh "$INSTALL_MODULE_NAME/"  "$INSTALL_SCRIPTS/$INSTALL_MODULE_NAME/"
-RUN bash "$INSTALL_SCRIPTS/$INSTALL_MODULE_NAME/install.sh" \
-    && bash "$INSTALL_SCRIPTS/$INSTALL_MODULE_NAME/install-playbook-grapher.sh" \
+RUN $INSTALL_SCRIPTS/$INSTALL_MODULE_NAME/install.sh --debug \
+		--ansible-version "${ANSIBLE_VERSION}"  \
+		--user-uid ${ANSIBLE_USER_UID}  \
+		--install-ansible-lint  \
+		--install-ansible-navigator  \
+		--install-playbook-grapher  \
     && rm -rf "$INSTALL_SCRIPTS/$INSTALL_MODULE_NAME/"
 
 
@@ -158,6 +155,11 @@ RUN mkdir -p /server/ansible/ansible  ;\
 	chown -R ansible: /server/ansible  ;\
 	ln -s /home/ansible/.ansible/collections /server/ansible/ansible/  ;\
 	install --owner ansible --group ansible --mode 755 -d /var/log/ansible
+
+
+# configuration for ansible-navigator
+ENV ANSIBLE_NAVIGATOR_EXECUTION_ENVIRONMENT=false
+ENV ANSIBLE_NAVIGATOR_LOG_FILE=/tmp/ansible-navigator.log
 
 
 # -----------------------------------------------------------------------------
