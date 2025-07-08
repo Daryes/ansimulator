@@ -19,14 +19,17 @@ help: ## Show the targets and their description (this screen)
 
 SHELL=/bin/bash -o pipefail
 
-DIFF ?=--diff
+OPTS ?=--diff
 
 ANSIBLE_SIMUL_DOCKERFILE_ROOTDIR=.ci/docker-ansimulator-template
 ANSIBLE_SIMUL_COMPOSE=.ci/docker-compose.ansimulator.yml
 ANSIBLE_SIMUL_COMPOSE_ENV=.ci/docker-compose.ansimulator.env
 ANSIBLE_SIMUL_REPO_ON_SERVER=/opt/repo/tests/ansible
 ANSIBLE_SIMUL_INVENTORY_ON_SERVER=${ANSIBLE_SIMUL_REPO_ON_SERVER}/inventory
-ANSIBLE_SIMUL_INVENTORY_EXEC=ansible-playbook ${DIFF} -i ${ANSIBLE_SIMUL_INVENTORY_ON_SERVER}  ${ANSIBLE_SIMUL_REPO_ON_SERVER}
+# activate the profiling of the playbooks and task duration executions
+ANSIBLE_SIMUL_INVENTORY_ENV=ANSIBLE_CALLBACKS_ENABLED=profile_tasks
+
+ANSIBLE_SIMUL_INVENTORY_EXEC=${ANSIBLE_SIMUL_INVENTORY_ENV} ansible-playbook ${OPTS} -i ${ANSIBLE_SIMUL_INVENTORY_ON_SERVER}  ${ANSIBLE_SIMUL_REPO_ON_SERVER}
 
 ANSIBLE_MASTER_CONTAINER=ci-ansible-master
 ANSIBLE_MASTER_INVENTORY_GROUP_ALL=domain
@@ -79,7 +82,7 @@ ansible-simul-connect: ## connect to the local ansible master container
 
 ansible-simul-validate: ## verify the communication from ansible master to the other containers using ssh
 	@${DOCKER_EXEC_ANSIBLE_CMD} -i -c "source ~/.bashrc; echo "" > ~/.ssh/known_hosts; exit 2>/dev/null"
-	@${DOCKER_EXEC_ANSIBLE_CMD} -i -c "ansible --one-line -i ${ANSIBLE_SIMUL_INVENTORY_ON_SERVER} -m ping ${ANSIBLE_MASTER_INVENTORY_GROUP_ALL}"
+	@${DOCKER_EXEC_ANSIBLE_CMD} -i -c "ansible --version; ansible --one-line -i ${ANSIBLE_SIMUL_INVENTORY_ON_SERVER} -m ping ${ANSIBLE_MASTER_INVENTORY_GROUP_ALL}"
 
 
 ansible-tools-compat-v2_14-update-roles:  ## update roles for ansible-core 2.14+ deprecations

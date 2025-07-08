@@ -1,12 +1,12 @@
 # Makefile - unit tests for Ansimulator
 
-test-unit-1-playbook-certificates: ## ansible role unit test: certificate-generate_ca + certificate-push-trusted + certificate-generate
+test-unit-1-playbook-certificates: ## ansible role unit test: certificate-generate_ca + certificate-push-trusted + certificate-generate - syntax : [OPTS="--diff --..."]
 	${DOCKER_EXEC_ANSIBLE_CMD} -c "${ANSIBLE_SIMUL_INVENTORY_EXEC}/playbook-test-certificate-generate_ca-push-generate.yml"
 
-test-unit-2-playbook-docker: ## ansible role unit test: sys-docker
+test-unit-2-playbook-docker: ## ansible role unit test: sys-docker - syntax : [OPTS="--diff --..."]
 	${DOCKER_EXEC_ANSIBLE_CMD} -c "${ANSIBLE_SIMUL_INVENTORY_EXEC}/playbook-test-docker.yml"
 
-test-unit-3-playbook-db: ## ansible role unit test: db-mysql & db-postgresql
+test-unit-3-playbook-db: ## ansible role unit test: db-mysql & db-postgresql - syntax : [OPTS="..."]
 	${DOCKER_EXEC_ANSIBLE_CMD} -c "${ANSIBLE_SIMUL_INVENTORY_EXEC}/playbook-test-db.yml"
 
 test-unit-4-playbook-web-nginx-apache: ## ansible roles unit test: web-nginx & web-apache
