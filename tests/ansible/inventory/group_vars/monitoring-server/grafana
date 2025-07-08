@@ -52,7 +52,6 @@ grafana_config_settings:
   - { section: "security",         param: "disable_gravatar",  value: "true" }
   - { section: "users",            param: "allow_sign_up",     value: "false" }
   - { section: "auth.anonymous",   param: "enabled",           value: "false" }
-  - { section: "dashboards",       param: "versions_to_keep",  value: "10" }
 
   # logs
   - { section: "log",              param: "mode",              value: "file" }
