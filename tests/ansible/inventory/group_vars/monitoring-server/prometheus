@@ -2,10 +2,10 @@
 
 # prometheus & alertmanager versions (+hash) to install - using the official github release as the rpm does not exist
 # ref: https://prometheus.io/download/
-prometheus_version: "2.45.2"
-prometheus_version_hash: "sha256:be2bd790336cd6beb87f0881c221b7b65d23cb1d2d16f570006546e091e58fc6"
-prometheus_alertmanager_version: "0.26.0"
-prometheus_alertmanager_version_hash: "sha256:abd73e2ee6bf67d3888699660abbecba7b076bf1f9459a3a8999d493b149ffa6"
+prometheus_version: "3.3.0"
+prometheus_version_hash: "sha256:cba98e0e17edab9f745122d92072e7de59440da9c975c51ecf982b0b2d630787"
+prometheus_alertmanager_version: "0.28.1"
+prometheus_alertmanager_version_hash: "sha256:5ac7ab5e4b8ee5ce4d8fb0988f9cb275efcc3f181b4b408179fafee121693311"
 
 
 # prometheus & alertmanager listen, port and service settings
@@ -21,10 +21,6 @@ prometheus_alertmanager_service_extra_args: ""
 # dir locations
 prometheus_conf_dir: "/server/prometheus/conf"
 prometheus_data_dir: "/server/prometheus/data"
-
-
-#prometheus_ssl_cert_pem: "/etc/ssl/private/reseau.local/reseau.local.pem"
-#prometheus_ssl_cert_key: "/etc/ssl/private/reseau.local/reseau.local.key"
 
 
 # basic auth

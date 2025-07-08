@@ -60,6 +60,7 @@ prometheus_job_website:
 
 
 # job blackbox - certificate
+prometheus_job_certificate_scrape_interval: "10m"
 prometheus_job_certificate:
   - { name: "apache first server", target: "{{ groups['web-apache'] |first }}:443" }
   - { name: "apache last server",  target: "{{ groups['web-apache'] |last }}:443" }

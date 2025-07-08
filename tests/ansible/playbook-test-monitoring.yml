@@ -30,7 +30,7 @@
   
   roles:
     - monitoring-prometheus
-  tags: server, prometheus, alertmanager
+  tags: server, prometheus, alertmanager, prometheus-server, monitoring-server
   # variables are in the inventory under group_vars/monitoring-server/
 
 
@@ -43,6 +43,6 @@
   roles:
     - monitoring-grafana
     # no nginx, set in the dedicated playbook-test-web.yml
-  tags: server, grafana
+  tags: server, grafana, monitoring-server
   # variables are in the inventory under group_vars/monitoring-server/
 

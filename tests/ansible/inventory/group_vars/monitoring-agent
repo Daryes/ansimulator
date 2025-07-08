@@ -4,15 +4,15 @@
 prometheus_agent_version_same_for_all: no
 
 
-prometheus_agent_node_version: "1.7.0"
-prometheus_agent_node_version_hash: "sha256:a550cd5c05f760b7934a2d0afad66d2e92e681482f5f57a917465b1fba3b02a6"
+prometheus_agent_node_version: "1.9.1"
+prometheus_agent_node_version_hash: "sha256:becb950ee80daa8ae7331d77966d94a611af79ad0d3307380907e0ec08f5b4e8"
 
 
-prometheus_agent_snmp_version: "0.25.0"
+prometheus_agent_snmp_version: "0.29.0"
 prometheus_agent_snmp_install: "{{ ( 'monitoring-server' in group_names) |bool }}"
 
 
-prometheus_agent_jmx_version: "0.18.0"
+prometheus_agent_jmx_version: "1.2.0"
 prometheus_agent_jmx_version_hash: ""
 prometheus_agent_jmx_install: "{{ ( 'sys-java' in group_names ) |bool }}"
 
@@ -24,14 +24,12 @@ monitoring-prometheus_agent_exporter_jmx:
 
 
 
-prometheus_agent_apache_version: "1.0.3"
+prometheus_agent_apache_version: "1.0.10"
 prometheus_agent_apache_version_hash: ""
 prometheus_agent_apache_install: "{{ ( 'web-apache' in group_names ) |bool }}"
 
 
 # activate ssl
-# prometheus_agent_ssl_cert_pem: "/etc/ssl/private/reseau.local/reseau.local.pem"
-# prometheus_agent_ssl_cert_key: "/etc/ssl/private/reseau.local/reseau.local.key"
 
 # activate basic auth
 prometheus_agent_auth_basic: yes

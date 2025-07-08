@@ -19,11 +19,11 @@
   roles:
     - monitoring-cadvisor_agent
   vars:
-    cadvisor_version: "0.49.1"
+    cadvisor_version: "0.52.1"
     cadvisor_host_listen_ip: "0.0.0.0"
     cadvisor_host_listen_port: "9135"
 
-    # cannot work in a container : /var/lib/docker is not moveable as it is a docker volume
+    # cannot work in a container : /var/lib/docker is not movable as this will be applied inside a docker volume
     # docker_data_dir: "{{ project_root }}/sys-docker"
 
     cadvisor_logging_driver_syslog: yes

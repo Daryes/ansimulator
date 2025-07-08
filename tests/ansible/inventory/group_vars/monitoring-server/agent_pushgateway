@@ -1,8 +1,8 @@
 ---
 
 # ref: https://prometheus.io/download/
-prometheus_agent_pushgateway_version: "1.5.1"
-prometheus_agent_pushgateway_version_hash: "sha256:3c1fb80e0e777fb98a9171c888adf9553bfab5a0b58af730ae108ac0970ec2a4"
+prometheus_agent_pushgateway_version: "1.11.1"
+prometheus_agent_pushgateway_version_hash: "sha256:6ce6ffab84d0d71195036326640295c02165462abd12b8092b0fa93188f5ee37"
 
 prometheus_agent_pushgateway_install: yes
 
