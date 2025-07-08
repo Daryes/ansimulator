@@ -30,24 +30,24 @@ Available topics :
 ## Usage
 
 All actions are controlled using the `Makefile`.  
-To list all the targets and their help, at the simulator root directory, simply use the command :
-```
-make
-```
+To list all the targets and their help, at the simulator root directory, simply use the command : `make`  
 An integrated help is available for each command.
 
 
 To start the simulator, the usual usage sequence using `make` is :  
-* ansible-simul-start
-* ansible-simul-validate
-* and either `ansible-simul-connect` or running some of the `test-unit-*` target.  
+* `make ansible-simul-start`
+* `make ansible-simul-validate`
+* and either `make ansible-simul-connect` or running some of the `make test-unit-*` target.  
 
-Then `ansible-simul-stop` when done to shut down the containers.
+Then `make ansible-simul-stop` when done to shut down the containers.
+
+NOTICE: given the commands will make use of docker and docker-compose, the current user must either be in the `docker` group,  
+or have sudoers rights. In such case, then use `sudo` in front of the `make` commands.
 
 
 To launch manually a playbook, follow this sequence : 
 ```
-ansible-simul-connect
+make ansible-simul-connect
 ansible-playbook -i /opt/repo/tests/ansible/inventory  /opt/repo/tests/ansible/<test playbook>.yml
 ```
 
@@ -61,7 +61,7 @@ It must contains at least the `ansible.cfg` file.
 If it is a simlink, it can be directed to your real ansible directory. 
 
 
-**Regarding the Makefile test-unit- targets :**  
+### Regarding the Makefile test-unit- targets  
 
 They are designed to work with the [ansible-roles](https://github.com/Daryes/ansible-roles) repository.  
 
@@ -87,7 +87,7 @@ Notice: the provided inventory uses `-` in the group names on purpose, ensuring 
 Ansible will raise a non-blocking warning about it, which can be hidden by adding this line to the ansible.cfg file,  [defaults] section : `force_valid_group_names = ignore`
 
 
-### First run
+## First run
 
 For a first installation, execute :                                                               
 (Notice : if running under WSL2, you need to activate systemd support first)
@@ -102,7 +102,7 @@ To alleviate any trouble for accessing the directories, the ansible user in the 
 As such, it is not recommended to have Root as the owner of the ansimulator files.
 
 
-### Starting the simulator and common usage
+## Starting the simulator and common usage
 
 To start the containers :
 ```
@@ -127,7 +127,7 @@ Notice : aside the ansible container, all other containers will only show the do
 This is a limitation of the deploy module from Docker, and cannot actually be changed.
 
 
-### Executing the tests
+## Executing the tests
 
 Use the `make` command to list the possible targets.  
 All the tests can be executed with :
@@ -139,14 +139,14 @@ It is highly possible the tab key for completion is usable with Make.
 
 The ansible's `--diff` mode is activated by default in the Makefile, and can be disabled with :
 ```
-make test-unit-<target>  DIFF=""
+make test-unit-<target>  OPTS=""
 ```
 
-Notice: you can use the DIFF parameter to pass other arguments to ansible.  
-If you still need diff itself, use it like this : `DIFF="--diff --tag ..."`
+Notice: you can use the OPTS parameter to pass other arguments to ansible.  
+If you still need diff itself, use it like this : `make <target...> OPTS="--diff --tag ..."`
 
 
-### Stop the simulator
+## Stop the simulator
 
 This will stop and remove the containers, cleaning everything which was installed on them.
 ```
