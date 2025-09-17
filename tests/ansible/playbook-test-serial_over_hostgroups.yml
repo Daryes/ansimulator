@@ -20,7 +20,7 @@
   # In a playbook, the order is : pre_tasks, roles, then tasks
   
   roles:
-    # usual usage is with an include, but works also as a standalone orle
+    # usual usage is with an include, but also works as a standalone role
     - name: _include-serial_over_hostgroups
       vars:
         serial_over_hostgroups_patterns:
@@ -29,11 +29,11 @@
           - "ci-test-debian-1:&linux"
           - "ci-group-debian:!ci-test-debian-1:&linux"
         serial_over_hostgroups_exclude_servers: []
-
+        serial_over_hostgroups_show_result: yes
 
   tasks:
-    # Let's see the resulting sets
-    - debug:
+    - name: debug task - print the result as the result of a function
+      debug:
         msg: "{{ _serial_over_hostgroups }}"
       run_once: yes
 
