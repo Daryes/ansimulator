@@ -68,7 +68,7 @@ ansible-simul-connect: ## connect to the local ansible master container
 
 ansible-simul-validate: ## verify the communication from ansible master to the other containers using ssh
 	@${DOCKER_EXEC_ANSIBLE_CMD} -i -c "source ~/.bashrc; echo "" > ~/.ssh/known_hosts; exit 2>/dev/null"
-	@${DOCKER_EXEC_ANSIBLE_CMD} -i -c "ansible --version; ansible --one-line -i ${ANSIBLE_SIMUL_INVENTORY_ON_SERVER} -m ping ${ANSIBLE_MASTER_INVENTORY_GROUP_ALL}"
+	@${DOCKER_EXEC_ANSIBLE_CMD} -i -c "ansible --version; ANSIBLE_SSH_RETRIES=3 ansible --one-line -i ${ANSIBLE_SIMUL_INVENTORY_ON_SERVER} -m ping ${ANSIBLE_MASTER_INVENTORY_GROUP_ALL}"
 
 
 ansible-tools-compat-v2_14-update-roles:  ## update roles for ansible-core 2.14+ deprecations
