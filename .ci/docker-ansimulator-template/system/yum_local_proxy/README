@@ -1,4 +1,4 @@
-# As opposite to APT, YUM only needs the following line in the "/etc/yum.conf" configuration file
+# As opposite to APT, DNF/YUM only needs the following line in the "/etc/yum.conf" configuration file
 #
 # proxy=http://user:pass@rpm-cache.domain.tld:3142
 

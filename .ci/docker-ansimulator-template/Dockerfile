@@ -87,7 +87,7 @@ EXPOSE 22
 ## Docker packages and installation (latest)
 
 # ref: https://github.com/docker/compose/releases
-ENV DOCKER_COMPOSE_VERSION="2.32.4"
+ENV DOCKER_COMPOSE_VERSION="2.38.2"
 # ref: https://github.com/mayflower/docker-ls
 ENV DOCKER_LS_VERSION="0.5.1"
 
@@ -95,7 +95,7 @@ ENV INSTALL_MODULE_NAME="DinD"
 COPY wrapper-*.sh "$INSTALL_MODULE_NAME/"  "$INSTALL_SCRIPTS/$INSTALL_MODULE_NAME/"
 RUN bash "$INSTALL_SCRIPTS/$INSTALL_MODULE_NAME/install.sh" && rm -rf "$INSTALL_SCRIPTS/$INSTALL_MODULE_NAME/"
 
-# mandatory volume for DinD
+# mandatory volume for DinD - no host sharing is required but it must exists
 VOLUME /var/lib/docker
 
 
@@ -119,6 +119,7 @@ RUN bash "$INSTALL_SCRIPTS/$INSTALL_MODULE_NAME/install.sh" && rm -rf "$INSTALL_
 # ansible-core 2.14 : Python 3.9-3.11	ansible-lint=6.10+	ansible-playbook-grapher=2.0.0
 # ansible-core 2.15 : Python 3.9-3.11	ansible-lint=6.*	ansible-playbook-grapher=2.2.1
 # ansible-core 2.16 : Python 3.10-3.12	ansible-lint=24+	ansible-playbook-grapher=2+
+# ansible-core 2.19 : Python 3.11-3.13	ansible-lint=25.7+	ansible-playbook-grapher=not yet
 
 
 # .* is required for the latest sub-version otherwise the .0 version will be automatically selected
@@ -150,7 +151,7 @@ ENV ANSIBLE_CONFIG=/etc/ansible/ansible.cfg
 # fix for host key validation - disabling is required for disposable containers
 ENV ANSIBLE_HOST_KEY_CHECKING=False
 
-# fix for custom environment
+# handle the custom environment
 RUN mkdir -p /server/ansible/ansible  ;\
 	chown -R ansible: /server/ansible  ;\
 	ln -s /home/ansible/.ansible/collections /server/ansible/ansible/  ;\

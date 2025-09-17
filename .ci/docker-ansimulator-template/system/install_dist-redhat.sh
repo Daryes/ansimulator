@@ -8,7 +8,7 @@ cd $( dirname $0 )
 
 # yum proxy cache
 if [ ! -z "${PKG_RPM_PROXY}" ]; then
-    echo "System: yum configuration for a local proxy found - installing ..."
+    echo "System: dnf/yum configuration for a local proxy found - installing ..."
     echo "proxy=${PKG_RPM_PROXY}" >> /etc/yum.conf
 fi
 
