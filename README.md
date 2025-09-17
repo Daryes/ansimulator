@@ -21,8 +21,10 @@ When terminated, the containers will be cleaned completely.
 
 Available topics :
 * Usage (next section)
+* [Changelog](https://github.com/Daryes/ansimulator/tags) - available in the tag descriptions.
 * [Requirements](doc/requirements.md) (dedicated page)
 * [Configuration](doc/config.md) (dedicated page)
+* [Building the images](doc/build.md) (dedicated page)
 * [Appendix & faq](doc/appendix.md) (dedicated page)
 
 
@@ -77,7 +79,7 @@ ln -s $( readlink -f ../ansible-roles ) ansible
 
 make help
 # use sudo if your user is not a member of the docker group
-make ansible-simul-docker-build
+make ansible-simul-docker-pull
 make ansible-simul-start
 make ansible-simul-validate
 make ...
@@ -92,14 +94,12 @@ Ansible will raise a non-blocking warning about it, which can be hidden by addin
 For a first installation, execute :                                                               
 (Notice : if running under WSL2, you need to activate systemd support first)
 ```
-make ansible-simul-docker-build
+make ansible-simul-docker-pull
 ```  
-This step will take some minutes to create the 2 images for the Debian and Centos containers used by the simulator.  
-Both Debian and Rocky Linux official images will be used and retrieved from dockerhub.  
-When the images have been created, using this step is not required anymore.
+It will retrieve from dockerhub the 2 images for the Debian and Centos containers used by the simulator.  
 
-To alleviate any trouble for accessing the directories, the ansible user in the containers will reuse the owner UID of the Makefile directory.  
-As such, it is not recommended to have Root as the owner of the ansimulator files.
+Notice : If you want to change the ansible user UID, or add the use of a proxy for APT and DNF/YUM, you need to rebuild the images.  
+See the dedicated documentation page for this.
 
 
 ## Starting the simulator and common usage

@@ -8,6 +8,8 @@ On the system, the following modules must be present:
   WSL2 is supported => https://docs.docker.com/desktop/windows/wsl/
   
 * docker-compose v2.x => https://github.com/docker/compose  
+  Optional: the current configuration use "compose" from the docker integrated plugin.  
+  If using "docker-compose" as a separate command, after installation, change also the variable `DOCKER_EXEC_COMPOSE_CMD` in the Makefile.conf.
 
 * the possibility to retrieve images from hub.docker.com (both Debian and Rocky Linux)
 

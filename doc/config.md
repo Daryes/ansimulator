@@ -3,7 +3,8 @@
 ---
 ## Ansimulator configuration
 
-All the images and docker-compose files are located under the directory `.ci/`  
+The docker-compose .env file is located under the directory `.ci/`  
+The makefile.conf file is located at the root of the ansimulator.
 
 
 ### Environment configuration
@@ -66,27 +67,6 @@ The following volume will be created or mounted :
 
 
 The custom inventory is placed under `tests/ansible/inventory`, which will be available as `/opt/ansible` on the ansible controller.
-
-
-### Updating the images and changing Ansible version
-
-The name and tag for the images are located in the `.ci/docker-compose.ansimulator.env` file.
-
-The Dockerfile is located under `.ci/docker-ansimulator-template/`  
-It is the same for both Debian and Centos (Rocky) images.
-
-The full configuration is not as usual, some elements like the module versions to deploy are still in the Dockerfile.  
-But due to the number of packages to install and configure, which are necessary to simulate a complete server, most of the commands are splitted under multiple directories, one per theme.  
-Each contains an install.sh file, with all the commands, and additional configuration files.  
-
-For example, to simply change the version to install for ansible, just the Dockerfile is enough, at the ansible section.  
-But if you want to fine-tune some system packages or the installation of ansible, look under `.ci/docker-ansimulator-template/system/`  or `...template/ansible/` directory.  
-
-Please note using python 3.9 on rhel/centos/rocky/alma release 8 raise multiple problems due to missing package variants for python 3.9.  
-As such, switching from ansible 2.9 to ansible 2.15 will requires to change the distribution release 8 to release 9.  
-Such restruction will be present, while less noticeable, for any distribution using a global python version different from the default one.
-
-To resume, to change ansible version from 2.9 to 2.15, you need to set the new version in the Dockerfile, and change in the docker-compose.ansimulator.env the IMAGE_CENTOS_REF_VERSION from 8.x to 9.x
 
 
 ### Roles compatibility between ansible v2.9 and v2.14+
