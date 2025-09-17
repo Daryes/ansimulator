@@ -9,20 +9,29 @@ collections:
   # ansible collections: https://docs.ansible.com/ansible/latest/collections/ansible/index.html
   # also : https://github.com/ansible-collections
   - name: ansible.netcommon
+    version: "<6.0.0"
 
   - name: ansible.utils
+    version: "<5.0.0"
 
   - name: ansible.posix
+    version: "<2.1.0"
 
   - name: ansible.windows
+    version: "<2.7.0"
 
   - name: community.general
+    version: "<10.0.0"
 
   - name: community.crypto
+    # crypto v3+ requires ansible-core v2.17+ but galaxy's api fails to apply the restriction - ref : https://github.com/ansible/ansible/issues/78539
+    version: "<3.0.0"
 
   - name: community.mysql
+    version: "<4.0.0"
 
   - name: community.postgresql
+    version: "<4.0.0"
 
 
 roles: []
