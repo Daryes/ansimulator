@@ -19,35 +19,13 @@ help: ## Show the targets and their description (this screen)
 
 SHELL=/bin/bash -o pipefail
 
-OPTS ?=--diff
 
-ANSIBLE_SIMUL_DOCKERFILE_ROOTDIR=.ci/docker-ansimulator-template
-ANSIBLE_SIMUL_COMPOSE=.ci/docker-compose.ansimulator.yml
-ANSIBLE_SIMUL_COMPOSE_ENV=.ci/docker-compose.ansimulator.env
-ANSIBLE_SIMUL_REPO_ON_SERVER=/opt/repo/tests/ansible
-ANSIBLE_SIMUL_INVENTORY_ON_SERVER=${ANSIBLE_SIMUL_REPO_ON_SERVER}/inventory
-# activate the profiling of the playbooks and task duration executions
-ANSIBLE_SIMUL_INVENTORY_ENV=ANSIBLE_CALLBACKS_ENABLED=profile_tasks
-
-ANSIBLE_SIMUL_INVENTORY_EXEC=${ANSIBLE_SIMUL_INVENTORY_ENV} ansible-playbook ${OPTS} -i ${ANSIBLE_SIMUL_INVENTORY_ON_SERVER}  ${ANSIBLE_SIMUL_REPO_ON_SERVER}
-
-ANSIBLE_MASTER_CONTAINER=ci-ansible-master
-ANSIBLE_MASTER_INVENTORY_GROUP_ALL=domain
-
-# using $$var make their expansion delayed when they are used in the build: target
-DOCKER_BUILD_CMD_COMMON_ARGS= --build-arg ANSIBLE_USER_UID=$$ANSIBLE_USER_UID \
-	--build-arg IMAGE_DEBIAN_NAME=$$IMAGE_DEBIAN_REF_NAME  --build-arg IMAGE_DEBIAN_VERSION=$$IMAGE_DEBIAN_REF_VERSION \
-	--build-arg IMAGE_CENTOS_NAME=$$IMAGE_CENTOS_REF_NAME  --build-arg IMAGE_CENTOS_VERSION=$$IMAGE_CENTOS_REF_VERSION \
-	--build-arg PKG_DEB_PROXY="$${PKG_DEB_PROXY:-}" --build-arg PKG_RPM_PROXY="$${PKG_RPM_PROXY:-}"  \
-	${ANSIBLE_SIMUL_DOCKERFILE_ROOTDIR}/
-
-ANSIBLE_SIMUL_COMPOSE_CMD=docker-compose -f ${ANSIBLE_SIMUL_COMPOSE}  --env-file ${ANSIBLE_SIMUL_COMPOSE_ENV}
-DOCKER_EXEC_BASE_CMD=docker exec -t --user ansible
-DOCKER_EXEC_ANSIBLE_CMD=${DOCKER_EXEC_BASE_CMD} ${ANSIBLE_MASTER_CONTAINER} /bin/bash
-DOCKER_EXEC_ANSIBLE_INTERACTIVE=${DOCKER_EXEC_BASE_CMD} -i ${ANSIBLE_MASTER_CONTAINER} /bin/bash
+# moved to an include file
+include Makefile.conf
 
 
-ansible-simul-docker-build: ## build the ansible simulator docker images with ssh support - required one time before any compose command
+# build, start and stop targets ---------------------
+ansible-simul-docker-build: ## build the ansible simulator docker images with ssh support - required one time when not using the docker hub images
 	@# the version is retrieved from the compose.env
 	@# the images are pulled instead of being stored into the builder cache which is volatile
 	set -eux ;\
@@ -56,14 +34,20 @@ ansible-simul-docker-build: ## build the ansible simulator docker images with ss
 		if [ -z "$$ANSIBLE_USER_UID" ] || [ $$ANSIBLE_USER_UID -eq 0 ]; then ANSIBLE_USER_UID=421; fi ;\
 		docker pull $$IMAGE_DEBIAN_REF_NAME:$$IMAGE_DEBIAN_REF_VERSION  ;\
 		docker pull $$IMAGE_CENTOS_REF_NAME:$$IMAGE_CENTOS_REF_VERSION  ;\
-		docker build -t $$IMAGE_CENTOS_CI --build-arg TARGET_DIST=redhat ${DOCKER_BUILD_CMD_COMMON_ARGS} ;\
-		docker build -t $$IMAGE_DEBIAN_CI --build-arg TARGET_DIST=debian ${DOCKER_BUILD_CMD_COMMON_ARGS}
+		DOCKER_BUILDKIT=${DOCKER_BUILD_CMD_USE_BUILDKIT}  docker build -t $$IMAGE_CENTOS_CI --build-arg TARGET_DIST=redhat ${DOCKER_BUILD_CMD_COMMON_ARGS} ;\
+		DOCKER_BUILDKIT=${DOCKER_BUILD_CMD_USE_BUILDKIT}  docker build -t $$IMAGE_DEBIAN_CI --build-arg TARGET_DIST=debian ${DOCKER_BUILD_CMD_COMMON_ARGS}
+
+
+ansible-simul-docker-pull: ## pull the ansible simulator images from docker hub
+	${ANSIBLE_SIMUL_COMPOSE_CMD} pull
+
 
 ansible-simul-up: ansible-simul-start
 ansible-simul-start: ## start the ansible test enviroment using compose
 	@# validate the configuration before start
 	${ANSIBLE_SIMUL_COMPOSE_CMD} config -q
 	${ANSIBLE_SIMUL_COMPOSE_CMD} up -d
+
 
 ansible-simul-down: ansible-simul-stop
 ansible-simul-stop: ## stop the docker containers using compose
@@ -72,13 +56,15 @@ ansible-simul-stop: ## stop the docker containers using compose
 		docker volume ls -q | grep -q "$$DOCKER_HOST_DOCKER_DATA_VOLUME" && \
 		docker volume rm $$DOCKER_HOST_DOCKER_DATA_VOLUME || true
 
+
 ansible-simul-status: ## status of the docker containers using compose
 	${ANSIBLE_SIMUL_COMPOSE_CMD} ps
 
 
 ansible-simul-connect: ## connect to the local ansible master container
-	@# the error 130 happens on a normDOCKER_EXEC_ANSIBLE_INTERACTIVEDOCKER_EXEC_ANSIBLE_INTERACTIVEDOCKER_EXEC_ANSIBLE_INTERACTIVEDOCKER_EXEC_ANSIBLE_INTERACTIVEDOCKER_EXEC_ANSIBLE_INTERACTIVEDOCKER_EXEC_ANSIBLE_INTERACTIVEDOCKER_EXEC_ANSIBLE_INTERACTIVEal logout when an error occured before or ctrl-c was pressed
+	@# the error 130 happens on a normal logout when an error occured in the shell or when ctrl-c was pressed
 	@${DOCKER_EXEC_ANSIBLE_INTERACTIVE} -l; if [ $$? -eq 130 ]; then exit 0; fi
+
 
 ansible-simul-validate: ## verify the communication from ansible master to the other containers using ssh
 	@${DOCKER_EXEC_ANSIBLE_CMD} -i -c "source ~/.bashrc; echo "" > ~/.ssh/known_hosts; exit 2>/dev/null"
@@ -100,3 +86,4 @@ ansible-tools-compat-v2_14-update-roles:  ## update roles for ansible-core 2.14+
 # Must be at the end
 -include Makefile.override
 
+# vim: noexpandtab filetype=make

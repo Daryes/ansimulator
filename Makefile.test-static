@@ -11,3 +11,5 @@ test-syntax-2-ansiblelint: ## run ansible-lint on the ansible playbooks
 test-syntax-3-playbook-check: ## run ansible-playbook syntax check
 	@${DOCKER_EXEC_ANSIBLE_CMD} -c "cd /etc/ansible && ansible-playbook --syntax-check -i ${ANSIBLE_SIMUL_INVENTORY_ON_SERVER}  *.yml"
 
+
+# vim: noexpandtab filetype=make

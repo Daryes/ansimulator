@@ -24,3 +24,5 @@ test-unit-7-playbook-dns-server: ## ansible role unit test: dns-bind
 test-unit-9-playbook-serial-over-hostgroups: ## ansible role unit test: _serial_over_hostgroups
 	${DOCKER_EXEC_ANSIBLE_CMD} -c "${ANSIBLE_SIMUL_INVENTORY_EXEC}/playbook-test-serial_over_hostgroups.yml"
 
+
+# vim: noexpandtab filetype=make
