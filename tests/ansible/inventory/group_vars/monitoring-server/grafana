@@ -1,5 +1,6 @@
 ---
 
+# grafana_version: "11.6.2"
 grafana_version: "9.3.8"
 grafana_version_hash_deb: ""
 grafana_version_hash_rpm: ""
@@ -36,6 +37,7 @@ grafana_plugins_install:
   - "vonage-status-panel"
   - "natel-discrete-panel"
   - "yesoreyeram-boomtheme-panel"
+  - "jdbranham-diagram-panel"
 
 
 grafana_config_settings:
@@ -56,6 +58,9 @@ grafana_config_settings:
   # logs
   - { section: "log",              param: "mode",              value: "file" }
   - { section: "log",              param: "level",             value: "warn" }
+
+  # angular support
+  - { section: "security",         param: "angular_support_enabled",  value: "true" }
 
 
 # monitoring exporter
