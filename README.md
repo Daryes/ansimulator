@@ -77,7 +77,12 @@ git clone https://github.com/Daryes/ansible-roles.git
 cd ansimulator
 ln -s $( readlink -f ../ansible-roles ) ansible
 
+# notice : if you plan to connect remotely on the service,
+# you need to edit the file '.ci/docker-compose.ansimulator.env' and change the listen IP
+
+# list the available commands
 make help
+
 # use sudo if your user is not a member of the docker group
 make ansible-simul-docker-pull
 make ansible-simul-start
