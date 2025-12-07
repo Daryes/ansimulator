@@ -43,8 +43,8 @@ To start the simulator, the usual usage sequence using `make` is :
 
 Then `make ansible-simul-stop` when done to shut down the containers.
 
-NOTICE: given the commands will make use of docker and docker-compose, the current user must either be in the `docker` group,  
-or have sudoers rights. In such case, then use `sudo` in front of the `make` commands.
+NOTICE: given the commands will make use of docker and docker-compose, the current user must either be in the `docker` group, or have sudoers rights.  
+In this case, use `sudo` in front of the `make` commands.
 
 
 To launch manually a playbook, follow this sequence : 
@@ -77,8 +77,8 @@ git clone https://github.com/Daryes/ansible-roles.git
 cd ansimulator
 ln -s $( readlink -f ../ansible-roles ) ansible
 
-# notice : if you plan to connect remotely on the service,
-# you need to edit the file '.ci/docker-compose.ansimulator.env' and change the listen IP
+# notice : if you plan to connect remotely on the installed services,
+# you need to edit the file '.ci/docker-compose.ansimulator.env' and change the listen IP to 0.0.0.0
 
 # list the available commands
 make help

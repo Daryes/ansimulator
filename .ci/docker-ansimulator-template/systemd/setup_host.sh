@@ -1,5 +1,10 @@
 #!/bin/sh
 # ref: https://raw.githubusercontent.com/solita/docker-systemd/master/setup
+#
+# This script allows to start systemd in containers on linux hosts lacking systemd, like WSL, or running under SysV.
+# The required virtual directories will be created in memory, allowing to start systemd in a container.
+# This script must be ran each time on the host system after a reboot.
+#
 
 set -eu
 
